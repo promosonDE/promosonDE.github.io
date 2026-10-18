@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 const skillCategories = [
   {
@@ -89,6 +90,9 @@ const skillCategories = [
 
 export default function SkillsSection() {
   const [activeCategory, setActiveCategory] = useState(0)
+  const titleAnim = useScrollAnimation()
+  const inventoryAnim = useScrollAnimation({ threshold: 0.05 })
+  const matrixAnim = useScrollAnimation({ threshold: 0.05 })
 
   return (
     <section id="skills" className="py-20 px-4 relative">
@@ -96,7 +100,10 @@ export default function SkillsSection() {
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section Title */}
-        <div className="text-center mb-12">
+        <div 
+          ref={titleAnim.ref}
+          className="text-center mb-12 scroll-animate-up"
+        >
           <h2 className="pixel-font text-xl sm:text-2xl text-[#FCDB05] mb-4 drop-shadow-[2px_2px_0px_#3C3C3C]">
             🎒 Inventory
           </h2>
@@ -105,17 +112,20 @@ export default function SkillsSection() {
         </div>
 
         {/* Inventory Grid */}
-        <div className="mc-panel">
-          {/* Category tabs */}
+        <div 
+          ref={inventoryAnim.ref}
+          className="mc-panel scroll-animate-up"
+        >
+          {/* Category tabs - responsive */}
           <div className="flex flex-wrap gap-2 mb-6 pb-4 border-b-2 border-[#5A5A5A]">
             {skillCategories.map((cat, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveCategory(idx)}
-                className={`px-3 py-2 text-sm border-2 transition-all ${
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm border-2 transition-all duration-300 ${
                   activeCategory === idx
-                    ? 'bg-[#4A7A2E] border-[#6BAF4A] text-white'
-                    : 'bg-[#3C3C3C] border-[#5A5A5A] text-gray-400 hover:bg-[#4A4A4A]'
+                    ? 'bg-[#4A7A2E] border-[#6BAF4A] text-white scale-105 shadow-lg shadow-[#4A7A2E]/30'
+                    : 'bg-[#3C3C3C] border-[#5A5A5A] text-gray-400 hover:bg-[#4A4A4A] hover:border-[#7F7F7F]'
                 }`}
               >
                 <span className="mr-1">{cat.icon}</span>
@@ -126,19 +136,24 @@ export default function SkillsSection() {
 
           {/* Active category content */}
           <div className="min-h-[200px]">
-            <h3 className="pixel-font text-sm mb-4" style={{ color: skillCategories[activeCategory].color }}>
+            <h3 className="pixel-font text-xs sm:text-sm mb-4 transition-all duration-300" style={{ color: skillCategories[activeCategory].color }}>
               {skillCategories[activeCategory].name}
             </h3>
             
             {/* Skill items in inventory grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
               {skillCategories[activeCategory].skills.map((skill, idx) => (
                 <div
-                  key={idx}
-                  className="mc-slot mc-block group"
+                  key={`${activeCategory}-${idx}`}
+                  className="mc-slot mc-block group scroll-animate-scale"
                   title={skill}
+                  style={{ 
+                    animationDelay: `${idx * 0.05}s`,
+                    opacity: 1,
+                    transform: 'scale(1)',
+                  }}
                 >
-                  <span className="text-sm text-center text-gray-200 group-hover:text-white transition-colors">
+                  <span className="text-xs sm:text-sm text-center text-gray-200 group-hover:text-white transition-colors">
                     {skill}
                   </span>
                 </div>
@@ -149,11 +164,11 @@ export default function SkillsSection() {
           {/* Hotbar - All categories overview */}
           <div className="mt-8 pt-4 border-t-2 border-[#5A5A5A]">
             <p className="pixel-font text-[10px] text-gray-400 mb-3">All Categories:</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {skillCategories.map((cat, idx) => (
                 <div key={idx} className="flex items-center gap-1">
                   <div 
-                    className="w-3 h-3" 
+                    className="w-3 h-3 transition-transform hover:scale-150" 
                     style={{ backgroundColor: cat.color }}
                   />
                   <span className="text-xs text-gray-400">{cat.skills.length}</span>
@@ -164,18 +179,28 @@ export default function SkillsSection() {
         </div>
 
         {/* Full skills grid - compact view */}
-        <div className="mt-8 mc-panel">
+        <div 
+          ref={matrixAnim.ref}
+          className="mt-8 mc-panel scroll-animate-up"
+        >
           <h3 className="pixel-font text-xs text-[#FCDB05] mb-4">📋 Complete Skill Matrix</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {skillCategories.map((cat, idx) => (
-              <div key={idx} className="bg-[#2C2C2C] border border-[#5A5A5A] p-3">
+              <div 
+                key={idx} 
+                className="bg-[#2C2C2C] border border-[#5A5A5A] p-3 transition-all duration-300 hover:border-[#7F7F7F] hover:bg-[#353535] scroll-animate-up"
+                style={{ transitionDelay: `${idx * 0.05}s` }}
+              >
                 <div className="flex items-center gap-2 mb-2">
-                  <span>{cat.icon}</span>
-                  <span className="text-sm font-bold" style={{ color: cat.color }}>{cat.name}</span>
+                  <span className="text-lg">{cat.icon}</span>
+                  <span className="text-xs sm:text-sm font-bold" style={{ color: cat.color }}>{cat.name}</span>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {cat.skills.map((skill, sidx) => (
-                    <span key={sidx} className="text-xs bg-[#3C3C3C] px-2 py-0.5 text-gray-300 border border-[#5A5A5A]">
+                    <span 
+                      key={sidx} 
+                      className="text-xs bg-[#3C3C3C] px-2 py-0.5 text-gray-300 border border-[#5A5A5A] transition-all hover:bg-[#4A4A4A] hover:border-[#7F7F7F]"
+                    >
                       {skill}
                     </span>
                   ))}
@@ -185,6 +210,9 @@ export default function SkillsSection() {
           </div>
         </div>
       </div>
+
+      {/* Section divider */}
+      <div className="absolute bottom-0 left-0 right-0 section-divider" />
     </section>
   )
 }

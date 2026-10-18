@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 const experiences = [
   {
@@ -72,6 +73,7 @@ const experiences = [
 
 export default function ExperienceSection() {
   const [expandedIdx, setExpandedIdx] = useState(0)
+  const titleAnim = useScrollAnimation()
 
   return (
     <section id="experience" className="py-20 px-4 relative">
@@ -79,7 +81,10 @@ export default function ExperienceSection() {
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section Title */}
-        <div className="text-center mb-12">
+        <div 
+          ref={titleAnim.ref}
+          className="text-center mb-12 scroll-animate-up"
+        >
           <h2 className="pixel-font text-xl sm:text-2xl text-[#FCDB05] mb-4 drop-shadow-[2px_2px_0px_#3C3C3C]">
             ⚔️ Quest Log
           </h2>
@@ -93,94 +98,137 @@ export default function ExperienceSection() {
           <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 timeline-line transform md:-translate-x-1/2" />
 
           {experiences.map((exp, idx) => (
-            <div key={idx} className={`relative mb-12 md:mb-16 ${idx % 2 === 0 ? 'md:pr-[52%]' : 'md:pl-[52%]'}`}>
-              {/* Timeline dot */}
-              <div 
-                className="absolute left-4 md:left-1/2 w-5 h-5 border-2 transform md:-translate-x-1/2 z-10"
-                style={{ 
-                  backgroundColor: exp.color,
-                  borderColor: exp.color,
-                  boxShadow: `0 0 10px ${exp.color}`
-                }}
-              />
-
-              {/* Quest card */}
-              <div 
-                className={`ml-12 md:ml-0 mc-panel mc-block cursor-pointer ${idx % 2 === 0 ? 'md:mr-4' : 'md:ml-4'}`}
-                onClick={() => setExpandedIdx(expandedIdx === idx ? -1 : idx)}
-              >
-                {/* Quest header */}
-                <div className="flex items-start gap-3 mb-3">
-                  <div 
-                    className="w-12 h-12 flex items-center justify-center border-2 text-2xl shrink-0"
-                    style={{ backgroundColor: `${exp.color}20`, borderColor: exp.color }}
-                  >
-                    {exp.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="pixel-font text-xs sm:text-sm" style={{ color: exp.color }}>
-                      {exp.title}
-                    </h3>
-                    <p className="text-white text-lg font-bold">{exp.company}</p>
-                    <p className="text-gray-400 text-sm">{exp.location} • {exp.period}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="pixel-font text-[10px]" style={{ color: exp.color }}>{exp.level}</span>
-                    <div className="w-16 xp-bar mt-1">
-                      <div className="xp-bar-fill" style={{ width: exp.xp }} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quest description */}
-                <p className="text-gray-300 text-base mb-3">{exp.description}</p>
-
-                {/* Expanded content */}
-                {expandedIdx === idx && (
-                  <div className="mt-4 pt-4 border-t border-[#5A5A5A]">
-                    <h4 className="pixel-font text-[10px] text-[#FCDB05] mb-3">📋 Quest Objectives:</h4>
-                    <ul className="space-y-2 mb-4">
-                      {exp.achievements.map((achievement, aidx) => (
-                        <li key={aidx} className="flex items-start gap-2 text-gray-300 text-base">
-                          <span className="text-[#17DD62] mt-0.5">✦</span>
-                          <span>{achievement}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* Tech stack */}
-                    <div className="mt-4 pt-3 border-t border-[#5A5A5A]">
-                      <h4 className="pixel-font text-[10px] text-gray-400 mb-2">🔧 Loot Drops:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {exp.tech.map((t, tidx) => (
-                          <span 
-                            key={tidx} 
-                            className="text-xs px-2 py-1 border"
-                            style={{ 
-                              backgroundColor: `${exp.color}15`, 
-                              borderColor: `${exp.color}40`,
-                              color: exp.color 
-                            }}
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Click indicator */}
-                <div className="text-center mt-2">
-                  <span className="pixel-font text-[8px] text-gray-500">
-                    {expandedIdx === idx ? '▲ Click to collapse ▲' : '▼ Click to expand ▼'}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <ExperienceCard 
+              key={idx} 
+              exp={exp} 
+              idx={idx} 
+              expandedIdx={expandedIdx}
+              setExpandedIdx={setExpandedIdx}
+            />
           ))}
         </div>
       </div>
+
+      {/* Section divider */}
+      <div className="absolute bottom-0 left-0 right-0 section-divider" />
     </section>
+  )
+}
+
+interface ExperienceCardProps {
+  exp: typeof experiences[0]
+  idx: number
+  expandedIdx: number
+  setExpandedIdx: (idx: number) => void
+}
+
+function ExperienceCard({ exp, idx, expandedIdx, setExpandedIdx }: ExperienceCardProps) {
+  const cardAnim = useScrollAnimation({ threshold: 0.1 })
+  const isExpanded = expandedIdx === idx
+
+  return (
+    <div 
+      ref={cardAnim.ref}
+      className={`relative mb-12 md:mb-16 ${idx % 2 === 0 ? 'md:pr-[52%]' : 'md:pl-[52%]'} ${idx % 2 === 0 ? 'scroll-animate-left' : 'scroll-animate-right'}`}
+    >
+      {/* Timeline dot */}
+      <div 
+        className="absolute left-[14px] md:left-1/2 w-5 h-5 border-2 transform md:-translate-x-1/2 z-10 transition-all duration-500"
+        style={{ 
+          backgroundColor: isExpanded ? exp.color : 'transparent',
+          borderColor: exp.color,
+          boxShadow: isExpanded ? `0 0 15px ${exp.color}, 0 0 30px ${exp.color}` : `0 0 5px ${exp.color}`,
+        }}
+      />
+
+      {/* Quest card */}
+      <div 
+        className={`ml-12 md:ml-0 mc-panel mc-block ${idx % 2 === 0 ? 'md:mr-4' : 'md:ml-4'}`}
+        onClick={() => setExpandedIdx(isExpanded ? -1 : idx)}
+      >
+        {/* Quest header */}
+        <div className="flex items-start gap-3 mb-3">
+          <div 
+            className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center border-2 text-xl sm:text-2xl shrink-0 transition-all duration-300"
+            style={{ 
+              backgroundColor: isExpanded ? `${exp.color}30` : `${exp.color}10`, 
+              borderColor: exp.color,
+              transform: isExpanded ? 'scale(1.1) rotate(5deg)' : 'scale(1) rotate(0deg)',
+            }}
+          >
+            {exp.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="pixel-font text-[10px] sm:text-xs" style={{ color: exp.color }}>
+              {exp.title}
+            </h3>
+            <p className="text-white text-base sm:text-lg font-bold truncate">{exp.company}</p>
+            <p className="text-gray-400 text-xs sm:text-sm">{exp.location} • {exp.period}</p>
+          </div>
+          <div className="text-right shrink-0">
+            <span className="pixel-font text-[8px] sm:text-[10px]" style={{ color: exp.color }}>{exp.level}</span>
+            <div className="w-12 sm:w-16 xp-bar mt-1">
+              <div className="xp-bar-fill" style={{ width: exp.xp }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Quest description */}
+        <p className="text-gray-300 text-sm sm:text-base mb-3">{exp.description}</p>
+
+        {/* Expanded content */}
+        <div 
+          className={`overflow-hidden transition-all duration-500 ease-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
+        >
+          <div className="pt-4 border-t border-[#5A5A5A]">
+            <h4 className="pixel-font text-[10px] text-[#FCDB05] mb-3">📋 Quest Objectives:</h4>
+            <ul className="space-y-2 mb-4">
+              {exp.achievements.map((achievement, aidx) => (
+                <li 
+                  key={aidx} 
+                  className="flex items-start gap-2 text-gray-300 text-sm sm:text-base transition-all duration-300"
+                  style={{ 
+                    transitionDelay: isExpanded ? `${aidx * 0.05}s` : '0s',
+                    opacity: isExpanded ? 1 : 0,
+                    transform: isExpanded ? 'translateX(0)' : 'translateX(-10px)',
+                  }}
+                >
+                  <span className="text-[#17DD62] mt-0.5 shrink-0">✦</span>
+                  <span>{achievement}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Tech stack */}
+            <div className="mt-4 pt-3 border-t border-[#5A5A5A]">
+              <h4 className="pixel-font text-[10px] text-gray-400 mb-2">🔧 Loot Drops:</h4>
+              <div className="flex flex-wrap gap-1">
+                {exp.tech.map((t, tidx) => (
+                  <span 
+                    key={tidx} 
+                    className="text-xs px-2 py-1 border transition-all duration-300 hover:scale-105"
+                    style={{ 
+                      backgroundColor: `${exp.color}15`, 
+                      borderColor: `${exp.color}40`,
+                      color: exp.color,
+                      transitionDelay: isExpanded ? `${tidx * 0.03}s` : '0s',
+                    }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Click indicator */}
+        <div className="text-center mt-2">
+          <span className="pixel-font text-[8px] text-gray-500 transition-all duration-300">
+            {isExpanded ? '▲ Click to collapse ▲' : '▼ Click to expand ▼'}
+          </span>
+        </div>
+      </div>
+    </div>
   )
 }
