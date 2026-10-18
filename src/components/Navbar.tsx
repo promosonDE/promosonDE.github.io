@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { downloadCV } from '../utils/generateCV'
 
 interface NavbarProps {
   activeSection: string
@@ -78,12 +77,6 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 {item.label}
               </button>
             ))}
-            <button
-              onClick={downloadCV}
-              className="ml-2 px-3 py-2 pixel-font text-[9px] border-2 bg-[#4A7A2E]/80 border-[#6BAF4A] text-white hover:bg-[#5D8C3E] hover:scale-105 transition-all duration-300 backdrop-blur-sm"
-            >
-              📄 Download CV
-            </button>
           </div>
 
           {/* Mobile menu button - visible only below lg (1024px) */}
@@ -119,18 +112,6 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 {item.label}
               </button>
             ))}
-            <button
-              onClick={downloadCV}
-              className="w-full text-left px-4 py-3 pixel-font text-[10px] border-2 bg-[#4A7A2E] border-[#6BAF4A] text-white hover:bg-[#5D8C3E] transition-all duration-300"
-              style={{ 
-                transitionDelay: mobileOpen ? `${navItems.length * 0.05}s` : '0s',
-                transform: mobileOpen ? 'translateX(0)' : 'translateX(-20px)',
-                opacity: mobileOpen ? 1 : 0,
-              }}
-            >
-              <span className="mr-2 text-base">📄</span>
-              Download CV
-            </button>
           </div>
         </div>
       </div>
