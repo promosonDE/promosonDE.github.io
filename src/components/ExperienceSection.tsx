@@ -77,7 +77,7 @@ export default function ExperienceSection() {
 
   return (
     <section id="experience" className="py-20 px-4 relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e] via-[#2a1a1a] to-[#1a1a2e]" />
+      <div className="absolute inset-0 bg-[#1a1a2e]/60 backdrop-blur-[1px]" />
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section Title */}

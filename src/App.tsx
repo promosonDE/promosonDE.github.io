@@ -8,6 +8,8 @@ import EducationSection from './components/EducationSection'
 import Footer from './components/Footer'
 import LoadingScreen from './components/LoadingScreen'
 import Particles from './components/Particles'
+import MinecraftCharacter from './components/MinecraftCharacter'
+import MinecraftVillage from './components/MinecraftVillage'
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
@@ -69,15 +71,28 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e]">
+    <div className="min-h-screen bg-[#1a1a2e] relative">
+      {/* Minecraft Village Background */}
+      <MinecraftVillage />
+      
+      {/* Floating particles */}
       <Particles />
+      
+      {/* Navigation */}
       <Navbar activeSection={activeSection} />
-      <HeroSection />
-      <AboutSection />
-      <SkillsSection />
-      <ExperienceSection />
-      <EducationSection />
-      <Footer />
+      
+      {/* Main Content */}
+      <main className="relative z-10">
+        <HeroSection />
+        <AboutSection />
+        <SkillsSection />
+        <ExperienceSection />
+        <EducationSection />
+        <Footer />
+      </main>
+      
+      {/* Running Minecraft Character */}
+      <MinecraftCharacter />
       
       {/* Back to top button */}
       <BackToTop />

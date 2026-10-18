@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="relative py-12 px-4 border-t-4 border-[#5D8C3E]">
       {/* Dirt background */}
       <div className="absolute inset-0 dirt-bg opacity-30" />
-      <div className="absolute inset-0 bg-[#1a1a2e]/90" />
+      <div className="absolute inset-0 bg-[#1a1a2e]/60 backdrop-blur-[1px]" />
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Grass top border */}
