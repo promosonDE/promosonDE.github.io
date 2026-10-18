@@ -582,6 +582,20 @@ h1, h2, h3, h4, h5, h6, .pixel-font {
   }
 }
 
+/* Small tablet portrait - optimize layout */
+@media (min-width: 641px) and (max-width: 1023px) and (orientation: portrait) {
+  .mc-panel {
+    padding: 16px;
+  }
+}
+
+/* Small tablet landscape and above - full layout */
+@media (min-width: 1024px) {
+  .mc-panel {
+    padding: 24px;
+  }
+}
+
 @media (max-width: 480px) {
   .pixel-font {
     letter-spacing: -0.5px;

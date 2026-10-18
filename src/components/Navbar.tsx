@@ -24,6 +24,17 @@ export default function Navbar({ activeSection }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setMobileOpen(false)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id)
     if (el) {
@@ -50,8 +61,8 @@ export default function Navbar({ activeSection }: NavbarProps) {
             </span>
           </div>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Desktop Nav - visible on lg (1024px) and above */}
+          <div className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -68,17 +79,17 @@ export default function Navbar({ activeSection }: NavbarProps) {
             ))}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button - visible only below lg (1024px) */}
           <button
-            className="md:hidden mc-btn text-[8px] px-3 py-2"
+            className="lg:hidden mc-btn text-[8px] px-3 py-2"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? '✕ Close' : '☰ Menu'}
           </button>
         </div>
 
-        {/* Mobile Nav */}
-        <div className={`md:hidden overflow-hidden transition-all duration-500 ease-out ${
+        {/* Mobile Nav - only visible below lg (1024px) */}
+        <div className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${
           mobileOpen ? 'max-h-80 opacity-100 pb-4' : 'max-h-0 opacity-0'
         }`}>
           <div className="space-y-1">
