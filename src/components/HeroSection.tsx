@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useMouseParallax } from '../hooks/useScrollAnimation'
+import { downloadCV } from '../utils/generateCV'
 
 export default function HeroSection() {
   const [loaded, setLoaded] = useState(false)
@@ -100,6 +101,9 @@ export default function HeroSection() {
           </a>
           <button onClick={() => document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth' })} className="mc-btn text-xs w-full sm:w-auto">
             🎒 View Inventory
+          </button>
+          <button onClick={downloadCV} className="mc-btn text-xs w-full sm:w-auto bg-[#4A7A2E] hover:bg-[#5D8C3E]">
+            📄 Download CV
           </button>
         </div>
 

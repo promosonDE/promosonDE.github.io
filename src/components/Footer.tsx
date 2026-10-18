@@ -1,4 +1,5 @@
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
+import { downloadCV } from '../utils/generateCV'
 
 export default function Footer() {
   const footerAnim = useScrollAnimation()
@@ -64,6 +65,12 @@ export default function Footer() {
             >
               🔗 LinkedIn
             </a>
+            <button 
+              onClick={downloadCV}
+              className="mc-btn text-[8px] sm:text-xs flex items-center gap-2 bg-[#4A7A2E] hover:bg-[#5D8C3E]"
+            >
+              📄 Download CV
+            </button>
           </div>
 
           {/* XP bar */}
