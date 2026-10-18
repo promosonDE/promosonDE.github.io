@@ -1,1 +1,231 @@
 @import "tailwindcss";
+
+:root {
+  --mc-green: #5D8C3E;
+  --mc-dark-green: #3B5E2B;
+  --mc-dirt: #8B6914;
+  --mc-dark-dirt: #6B4F12;
+  --mc-stone: #7F7F7F;
+  --mc-dark-stone: #5A5A5A;
+  --mc-sky: #7BA4D4;
+  --mc-dark-sky: #4A7AB5;
+  --mc-gold: #FCDB05;
+  --mc-red: #B02E26;
+  --mc-diamond: #4AEDD9;
+  --mc-emerald: #17DD62;
+  --mc-obsidian: #1B1028;
+  --mc-endstone: #DBD3A0;
+  --mc-bedrock: #2C2C2C;
+  --mc-wood: #BC9862;
+  --mc-dark-wood: #6B5030;
+  --mc-lava: #CF4A1A;
+  --mc-water: #3F76E4;
+}
+
+* {
+  image-rendering: pixelated;
+}
+
+body {
+  font-family: 'VT323', monospace;
+  background-color: #1a1a2e;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .pixel-font {
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* Minecraft button style */
+.mc-btn {
+  font-family: 'Press Start 2P', cursive;
+  background: linear-gradient(to bottom, #7F7F7F 0%, #5A5A5A 50%, #4A4A4A 100%);
+  border: 3px solid;
+  border-color: #A0A0A0 #3C3C3C #3C3C3C #A0A0A0;
+  color: white;
+  text-shadow: 2px 2px 0px #3C3C3C;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.mc-btn:hover {
+  background: linear-gradient(to bottom, #9A9AFF 0%, #6A6AFF 50%, #5A5AFF 100%);
+  border-color: #B0B0FF #4040AA #4040AA #B0B0FF;
+}
+
+.mc-btn:active {
+  transform: translateY(2px);
+}
+
+/* Minecraft panel style */
+.mc-panel {
+  background: rgba(0, 0, 0, 0.75);
+  border: 3px solid;
+  border-color: #5A5A5A #2C2C2C #2C2C2C #5A5A5A;
+  padding: 20px;
+  position: relative;
+}
+
+.mc-panel::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  border: 1px solid rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+
+/* Inventory slot style */
+.mc-slot {
+  background: #8B8B8B;
+  border: 3px solid;
+  border-color: #373737 #FFFFFF #FFFFFF #373737;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2C2C2C;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5A5A5A;
+  border: 2px solid #3C3C3C;
+}
+
+/* Pixel animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px var(--mc-diamond), 0 0 10px var(--mc-diamond); }
+  50% { box-shadow: 0 0 15px var(--mc-diamond), 0 0 30px var(--mc-diamond); }
+}
+
+@keyframes block-rotate {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Dirt pattern background */
+.dirt-bg {
+  background-color: #8B6914;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px),
+    repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px);
+}
+
+/* Stone pattern */
+.stone-bg {
+  background-color: #7F7F7F;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(0,0,0,0.08) 15px, rgba(0,0,0,0.08) 16px),
+    repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(0,0,0,0.08) 15px, rgba(0,0,0,0.08) 16px);
+}
+
+/* Grass block top */
+.grass-top {
+  background: linear-gradient(to bottom, #5D8C3E 0%, #4A7A2E 40%, #8B6914 40%, #8B6914 100%);
+}
+
+/* Tooltip style */
+.mc-tooltip {
+  background: #100010;
+  border: 2px solid;
+  border-color: #2D0A63 #2D0A63 #2D0A63 #2D0A63;
+  outline: 1px solid #000;
+  padding: 4px 8px;
+  font-family: 'VT323', monospace;
+  color: #fff;
+}
+
+/* Nav active indicator */
+.nav-active {
+  background: linear-gradient(to bottom, #4A7A2E 0%, #3B5E2B 100%);
+  border-color: #6BAF4A #2A4A1A #2A4A1A #6BAF4A;
+}
+
+/* Experience timeline */
+.timeline-line {
+  background: linear-gradient(to bottom, var(--mc-diamond), var(--mc-emerald), var(--mc-gold));
+}
+
+/* Heart bar style */
+.heart {
+  color: var(--mc-red);
+  text-shadow: 1px 1px 0px #5A0000;
+}
+
+/* XP bar */
+.xp-bar {
+  background: #003300;
+  border: 2px solid #001A00;
+  height: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  background: linear-gradient(to bottom, #80FF20 0%, #40C000 50%, #208000 100%);
+  height: 100%;
+  transition: width 1s ease;
+}
+
+/* Block hover effect */
+.mc-block {
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.mc-block:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+}
+
+/* Pixel border utility */
+.pixel-border {
+  border: 4px solid;
+  border-image: repeating-linear-gradient(
+    90deg,
+    #5A5A5A 0px,
+    #5A5A5A 4px,
+    #3C3C3C 4px,
+    #3C3C3C 8px
+  ) 4;
+}
+
+/* Stars / particles */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.star {
+  animation: twinkle var(--duration, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
