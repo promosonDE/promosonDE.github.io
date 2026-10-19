@@ -17,8 +17,15 @@ export default function Navbar({ activeSection }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 50)
+          ticking = false
+        })
+        ticking = true
+      }
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -52,7 +59,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollTo('home')}>
+      <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollTo('home')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollTo('home'); } }} aria-label="Scroll to home">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#5D8C3E] border-2 border-[#3B5E2B] flex items-center justify-center transition-transform hover:scale-110 hover:rotate-6 shadow-lg shadow-black/30">
               <span className="text-white text-[8px] sm:text-xs font-bold pixel-font">PP</span>
             </div>
@@ -80,18 +87,26 @@ export default function Navbar({ activeSection }: NavbarProps) {
           </div>
 
           {/* Mobile menu button - visible only below lg (1024px) */}
-          <button
-            className="lg:hidden mc-btn text-[8px] px-3 py-2"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? '✕ Close' : '☰ Menu'}
-          </button>
+          {/* Mobile menu button - visible only below lg (1024px) */}
+          {/* Wrapper div is required: .mc-btn sets display:inline-block in
+              unlayered CSS, which would override the lg:hidden utility. */}
+          <div className="lg:hidden">
+            <button
+              className="mc-btn text-[8px] px-3 py-2"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+            >
+              {mobileOpen ? '✕ Close' : '☰ Menu'}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Nav - only visible below lg (1024px) */}
         <div className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${
           mobileOpen ? 'max-h-80 opacity-100 pb-4' : 'max-h-0 opacity-0'
-        }`}>
+        }`} id="mobile-nav">
           <div className="space-y-1 bg-[#1a1a2e]/80 backdrop-blur-sm rounded-b-lg p-2">
             {navItems.map((item, idx) => (
               <button

@@ -1,14 +1,22 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 
 export default function MinecraftVillage() {
   const [scrollY, setScrollY] = useState(0)
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  const villageRef = useRef<HTMLDivElement>(null)
+  const rafRef = useRef<number>(0)
+  const reducedMotion = useRef(typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
+    if (reducedMotion.current) {
+      setScrollY(0)
+      return
+    }
+
     let ticking = false
     const handleScroll = () => {
       if (!ticking) {
-        requestAnimationFrame(() => {
+        rafRef.current = requestAnimationFrame(() => {
           setScrollY(window.scrollY)
           ticking = false
         })
@@ -22,6 +30,7 @@ export default function MinecraftVillage() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(rafRef.current)
     }
   }, [])
 
@@ -34,14 +43,14 @@ export default function MinecraftVillage() {
   // Generate village elements once
   const houses = useMemo(() => 
     Array.from({ length: 18 }, (_, i) => ({
-      x: i * 320 + (i % 2) * 80 + Math.random() * 40,
+      x: i * 320 + (i % 2) * 80 + (i * 17) % 40,
       type: i % 4,
     })), []
   )
 
   const trees = useMemo(() => 
     Array.from({ length: 30 }, (_, i) => ({
-      x: i * 190 + (i % 3) * 50 + Math.random() * 60,
+      x: i * 190 + (i % 3) * 50 + (i * 23) % 60,
       height: 35 + (i % 4) * 12,
     })), []
   )
@@ -64,6 +73,33 @@ export default function MinecraftVillage() {
     })), []
   )
 
+  const stars = useMemo(() => 
+    Array.from({ length: 40 }).map((_, i) => ({
+      id: i,
+      top: (i * 31) % 30,
+      left: (i * 43) % 100,
+      duration: 2 + (i % 4),
+      delay: i % 3,
+    })), []
+  )
+
+  const mountains = useMemo(() => 
+    Array.from({ length: 12 }).map((_, i) => ({
+      id: i,
+      left: i * 200 - 50,
+      height: 100 + (i % 3) * 50,
+    })), []
+  )
+
+  const grassTufts = useMemo(() => 
+    Array.from({ length: 50 }).map((_, i) => ({
+      id: i,
+      left: i * 60 + (i * 7) % 30,
+      height: 6 + (i % 6),
+      color: i % 2 === 0 ? '#4A7A2E' : '#5D8C3E',
+    })), []
+  )
+
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
       {/* Sky gradient */}
@@ -71,22 +107,23 @@ export default function MinecraftVillage() {
         className="absolute inset-0"
         style={{
           background: 'linear-gradient(180deg, #0a0a2e 0%, #1a2a4e 20%, #2a4a6e 40%, #4a7a9e 60%, #7BA4D4 80%, #9BC4E4 100%)',
-          transform: `translateY(${scrollY * 0.03}px)`,
+          transform: reducedMotion.current ? undefined : `translate3d(0, ${scrollY * 0.03}px, 0)`,
+          willChange: reducedMotion.current ? 'auto' : 'transform',
         }}
       />
 
       {/* Stars */}
-      {Array.from({ length: 40 }).map((_, i) => (
+      {stars.map((s) => (
         <div
-          key={`star-${i}`}
+          key={`star-${s.id}`}
           className="star absolute bg-white"
           style={{
             width: '2px',
             height: '2px',
-            top: `${Math.random() * 30}%`,
-            left: `${Math.random() * 100}%`,
-            '--duration': `${2 + Math.random() * 4}s`,
-            '--delay': `${Math.random() * 3}s`,
+            top: `${s.top}%`,
+            left: `${s.left}%`,
+            '--duration': `${s.duration}s`,
+            '--delay': `${s.delay}s`,
           } as React.CSSProperties}
         />
       ))}
@@ -98,6 +135,8 @@ export default function MinecraftVillage() {
           top: `${80 + scrollY * 0.015}px`,
           right: '12%',
           boxShadow: '0 0 60px rgba(252, 219, 5, 0.5), 0 0 120px rgba(252, 219, 5, 0.2)',
+          transform: reducedMotion.current ? undefined : `translate3d(0, 0, 0)`,
+          willChange: reducedMotion.current ? 'auto' : 'top',
         }}
       >
         <div className="absolute inset-2 bg-[#FFE44D] opacity-60" />
@@ -106,7 +145,10 @@ export default function MinecraftVillage() {
       {/* Clouds - far background */}
       <div 
         className="absolute top-[5%] w-full"
-        style={{ transform: `translateX(${-scrollY * 0.03}px)` }}
+        style={{ 
+          transform: reducedMotion.current ? undefined : `translate3d(${-scrollY * 0.03}px, 0, 0)`,
+          willChange: reducedMotion.current ? 'auto' : 'transform',
+        }}
       >
         {[...Array(6)].map((_, i) => (
           <div
@@ -129,17 +171,18 @@ export default function MinecraftVillage() {
         className="absolute bottom-[100px] left-0 h-[180px]"
         style={{ 
           width: `${villageWidth * 0.5}px`,
-          transform: `translateX(${-scrollY * 0.06}px)` 
+          transform: reducedMotion.current ? undefined : `translate3d(${-scrollY * 0.06}px, 0, 0)`,
+          willChange: reducedMotion.current ? 'auto' : 'transform',
         }}
       >
-        {[...Array(12)].map((_, i) => (
+        {mountains.map((m) => (
           <div
-            key={`mountain-${i}`}
+            key={`mountain-${m.id}`}
             className="absolute bottom-0"
             style={{
-              left: `${i * 200 - 50}px`,
+              left: `${m.left}px`,
               width: '180px',
-              height: `${100 + (i % 3) * 50}px`,
+              height: `${m.height}px`,
               background: `linear-gradient(to bottom, #2A4A1A 0%, #1A3A0A 100%)`,
               clipPath: 'polygon(0% 100%, 15% 40%, 30% 55%, 50% 15%, 70% 45%, 85% 30%, 100% 100%)',
               opacity: 0.6,
@@ -150,10 +193,12 @@ export default function MinecraftVillage() {
 
       {/* Village layer - main parallax */}
       <div 
+        ref={villageRef}
         className="absolute bottom-[60px] left-0 h-[220px]"
         style={{ 
           width: `${villageWidth}px`,
-          transform: `translateX(${-scrollY * 0.15}px)` 
+          transform: reducedMotion.current ? undefined : `translate3d(${-scrollY * 0.15}px, 0, 0)`,
+          willChange: reducedMotion.current ? 'auto' : 'transform',
         }}
       >
         {/* Houses */}
@@ -221,18 +266,19 @@ export default function MinecraftVillage() {
         className="absolute bottom-[60px] left-0 h-[20px]"
         style={{ 
           width: `${villageWidth * 0.7}px`,
-          transform: `translateX(${-scrollY * 0.2}px)` 
+          transform: reducedMotion.current ? undefined : `translate3d(${-scrollY * 0.2}px, 0, 0)`,
+          willChange: reducedMotion.current ? 'auto' : 'transform',
         }}
       >
-        {[...Array(50)].map((_, i) => (
+        {grassTufts.map((g) => (
           <div
-            key={`grass-${i}`}
+            key={`grass-${g.id}`}
             className="absolute bottom-0"
             style={{
-              left: `${i * 60 + Math.random() * 30}px`,
+              left: `${g.left}px`,
               width: '3px',
-              height: `${6 + Math.random() * 10}px`,
-              backgroundColor: i % 2 === 0 ? '#4A7A2E' : '#5D8C3E',
+              height: `${g.height}px`,
+              backgroundColor: g.color,
             }}
           />
         ))}

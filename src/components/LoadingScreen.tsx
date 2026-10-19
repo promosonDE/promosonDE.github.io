@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 
 export default function LoadingScreen() {
   const [progress, setProgress] = useState(0)
   const [tip, setTip] = useState('')
 
-  const tips = [
+  const tips = useMemo(() => [
     'Loading terrain...',
     'Building data pipelines...',
     'Crafting cloud architecture...',
@@ -13,7 +13,19 @@ export default function LoadingScreen() {
     'Preparing inventory...',
     'Connecting to Azure...',
     'Optimizing queries...',
-  ]
+  ], [])
+
+  const blocks = useMemo(() => 
+    Array.from({ length: 20 }).map((_, i) => ({
+      id: i,
+      color: ['#4AEDD9', '#FCDB05', '#17DD62', '#B02E26'][i % 4],
+      size: 20 + (i * 7) % 40,
+      top: (i * 13) % 100,
+      left: (i * 17) % 100,
+      duration: 3 + (i % 4),
+      delay: i % 3,
+    })), []
+  )
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,24 +45,24 @@ export default function LoadingScreen() {
       clearInterval(interval)
       clearInterval(tipInterval)
     }
-  }, [])
+  }, [tips])
 
   return (
     <div className="fixed inset-0 z-[9999] bg-[#1a1a2e] flex flex-col items-center justify-center">
       {/* Background blocks */}
       <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {blocks.map((b) => (
           <div
-            key={i}
+            key={b.id}
             className="absolute opacity-10"
             style={{
-              width: `${20 + Math.random() * 40}px`,
-              height: `${20 + Math.random() * 40}px`,
-              backgroundColor: ['#4AEDD9', '#FCDB05', '#17DD62', '#B02E26'][Math.floor(Math.random() * 4)],
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`,
+              width: `${b.size}px`,
+              height: `${b.size}px`,
+              backgroundColor: b.color,
+              top: `${b.top}%`,
+              left: `${b.left}%`,
+              animation: `float ${b.duration}s ease-in-out infinite`,
+              animationDelay: `${b.delay}s`,
             }}
           />
         ))}
@@ -65,7 +77,7 @@ export default function LoadingScreen() {
           <div className="w-10 h-10 bg-[#4AEDD9] border-2 border-[#2ABCA9] animate-float" style={{ animationDelay: '0.6s' }} />
         </div>
         <h1 className="pixel-font text-lg sm:text-xl text-[#FCDB05] text-center drop-shadow-[2px_2px_0px_#3C3C3C]">
-          PROMASON POUDEL
+          PROMOSON POUDEL
         </h1>
       </div>
 

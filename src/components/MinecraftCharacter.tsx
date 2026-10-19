@@ -4,11 +4,26 @@ export default function MinecraftCharacter() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const [direction, setDirection] = useState<'left' | 'right'>('right')
+  // clientWidth excludes the scrollbar, so the character can never be placed
+  // past the right edge of the visible viewport.
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window !== 'undefined' ? document.documentElement.clientWidth : 1200
+  )
   const lastScrollRef = useRef(0)
   const rafRef = useRef<number>(0)
+  const reducedMotion = useRef(typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
+    const handleResize = () => setViewportWidth(document.documentElement.clientWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (reducedMotion.current) return
+
     let ticking = false
+    let stopTimer: ReturnType<typeof setTimeout>
 
     const handleScroll = () => {
       if (!ticking) {
@@ -36,27 +51,22 @@ export default function MinecraftCharacter() {
         })
         ticking = true
       }
-    }
 
-    // Stop running after scroll stops
-    let stopTimer: ReturnType<typeof setTimeout>
-    const handleScrollWithStop = () => {
-      handleScroll()
       setIsRunning(true)
       clearTimeout(stopTimer)
       stopTimer = setTimeout(() => setIsRunning(false), 200)
     }
 
-    window.addEventListener('scroll', handleScrollWithStop, { passive: true })
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
-      window.removeEventListener('scroll', handleScrollWithStop)
+      window.removeEventListener('scroll', handleScroll)
       cancelAnimationFrame(rafRef.current)
       clearTimeout(stopTimer)
     }
   }, [])
 
   // Character horizontal position based on scroll
-  const maxLeft = typeof window !== 'undefined' ? window.innerWidth - 70 : 1200
+  const maxLeft = Math.max(0, viewportWidth - 70)
   const charX = (scrollProgress / 100) * maxLeft
 
   return (
@@ -64,8 +74,10 @@ export default function MinecraftCharacter() {
       className="fixed z-40 pointer-events-none"
       style={{ 
         bottom: '58px',
-        left: `${Math.min(charX, maxLeft)}px`,
-        transition: 'left 0.05s linear',
+        left: reducedMotion.current ? '50%' : `${Math.min(charX, maxLeft)}px`,
+        transform: reducedMotion.current ? 'translateX(-50%)' : undefined,
+        transition: reducedMotion.current ? 'none' : 'left 0.05s linear',
+        willChange: reducedMotion.current ? 'auto' : 'left',
       }}
     >
       <div className={`minecraft-character ${isRunning ? 'running' : 'idle'} ${direction === 'left' ? 'facing-left' : 'facing-right'}`}>
@@ -109,7 +121,7 @@ export default function MinecraftCharacter() {
       </div>
       
       {/* Dust particles when running */}
-      {isRunning && (
+      {isRunning && !reducedMotion.current && (
         <div className="dust-container">
           {[...Array(5)].map((_, i) => (
             <div 
@@ -117,8 +129,8 @@ export default function MinecraftCharacter() {
               className="dust-particle"
               style={{ 
                 animationDelay: `${i * 0.08}s`,
-                '--dust-x': `${direction === 'right' ? -1 : 1} * ${8 + Math.random() * 16}px`,
-                '--dust-y': `${-3 - Math.random() * 8}px`,
+                '--dust-x': `${direction === 'right' ? -1 : 1} * ${8 + (i * 3) % 16}px`,
+                '--dust-y': `${-3 - (i * 2) % 8}px`,
               } as React.CSSProperties}
             />
           ))}

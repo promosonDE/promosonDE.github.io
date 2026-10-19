@@ -77,7 +77,7 @@ export default function ExperienceSection() {
 
   return (
     <section id="experience" className="py-20 px-4 relative">
-      <div className="absolute inset-0 bg-[#1a1a2e]/60 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 bg-[#1a1a2e]/70 backdrop-blur-[0.5px]" />
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section Title */}
@@ -141,10 +141,20 @@ function ExperienceCard({ exp, idx, expandedIdx, setExpandedIdx }: ExperienceCar
         }}
       />
 
-      {/* Quest card */}
+      {/* Quest card - toggleable, so expose it as a real button */}
       <div 
-        className={`ml-12 md:ml-0 mc-panel mc-block ${idx % 2 === 0 ? 'md:mr-4' : 'md:ml-4'}`}
+        className={`ml-12 md:ml-0 mc-panel mc-block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FCDB05] ${idx % 2 === 0 ? 'md:mr-4' : 'md:ml-4'}`}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isExpanded}
+        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} quest details for ${exp.title} at ${exp.company}`}
         onClick={() => setExpandedIdx(isExpanded ? -1 : idx)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setExpandedIdx(isExpanded ? -1 : idx)
+          }
+        }}
       >
         {/* Quest header */}
         <div className="flex items-start gap-3 mb-3">

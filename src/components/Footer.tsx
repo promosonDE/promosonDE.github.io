@@ -1,14 +1,27 @@
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
-import { downloadCV } from '../utils/generateCV'
+import DownloadCVButton from './DownloadCVButton'
+
+const footerNav = [
+  { id: 'home', label: 'Home', icon: '🏠' },
+  { id: 'about', label: 'Player Stats', icon: '📜' },
+  { id: 'skills', label: 'Inventory', icon: '🎒' },
+  { id: 'experience', label: 'Quest Log', icon: '⚔️' },
+  { id: 'education', label: 'Achievements', icon: '🏆' },
+]
+
+const scrollToSection = (id: string) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
 
 export default function Footer() {
   const footerAnim = useScrollAnimation()
+  const currentYear = new Date().getFullYear()
 
   return (
     <footer className="relative py-12 px-4 border-t-4 border-[#5D8C3E]">
       {/* Dirt background */}
       <div className="absolute inset-0 dirt-bg opacity-30" />
-      <div className="absolute inset-0 bg-[#1a1a2e]/60 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 bg-[#1a1a2e]/70 backdrop-blur-[0.5px]" />
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Grass top border */}
@@ -21,7 +34,7 @@ export default function Footer() {
           className="text-center scroll-animate-up"
         >
           {/* Minecraft style logo */}
-          <div className="flex justify-center gap-2 mb-6">
+          <div className="flex justify-center gap-2 mb-6" aria-hidden="true">
             {['#5D8C3E', '#8B6914', '#7F7F7F', '#4AEDD9'].map((color, idx) => (
               <div 
                 key={idx}
@@ -43,6 +56,21 @@ export default function Footer() {
             Senior Data Engineer | Cloud Architecture | Data Platforms
           </p>
 
+          {/* Section navigation */}
+          <nav aria-label="Footer" className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8">
+            {footerNav.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => scrollToSection(item.id)}
+                className="mc-btn text-[8px] sm:text-xs px-3 py-2"
+              >
+                <span className="mr-1">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
           {/* Contact links */}
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8">
             <a 
@@ -52,7 +80,7 @@ export default function Footer() {
               📧 Email
             </a>
             <a 
-              href="tel:469-587-9546" 
+              href="tel:+14695879546" 
               className="mc-btn text-[8px] sm:text-xs flex items-center gap-2"
             >
               📱 Phone
@@ -65,12 +93,7 @@ export default function Footer() {
             >
               🔗 LinkedIn
             </a>
-            <button 
-              onClick={downloadCV}
-              className="mc-btn text-[8px] sm:text-xs flex items-center gap-2 bg-[#4A7A2E] hover:bg-[#5D8C3E]"
-            >
-              📄 Download CV
-            </button>
+            <DownloadCVButton className="text-[8px] sm:text-xs flex items-center gap-2" />
           </div>
 
           {/* XP bar */}
@@ -86,7 +109,7 @@ export default function Footer() {
           {/* Copyright */}
           <div className="mc-panel inline-block">
             <p className="pixel-font text-[7px] sm:text-[8px] text-gray-400">
-              © 2024 Promoson Poudel | Built with ❤️ and ⛏️
+              © {currentYear} Promoson Poudel | Built with ❤️ and ⛏️
             </p>
             <p className="pixel-font text-[6px] sm:text-[7px] text-gray-500 mt-1">
               Minecraft Style Portfolio

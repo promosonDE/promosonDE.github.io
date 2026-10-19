@@ -10,8 +10,14 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
   const { threshold = 0.1, rootMargin = '0px 0px -50px 0px', triggerOnce = true } = options
   const ref = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const reducedMotion = useRef(typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
+    if (reducedMotion.current) {
+      setIsVisible(true)
+      return
+    }
+
     const element = ref.current
     if (!element) return
 
@@ -41,14 +47,25 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
 
 export function useParallax() {
   const [scrollY, setScrollY] = useState(0)
+  const rafRef = useRef<number>(0)
 
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
-      setScrollY(window.scrollY)
+      if (!ticking) {
+        rafRef.current = requestAnimationFrame(() => {
+          setScrollY(window.scrollY)
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      cancelAnimationFrame(rafRef.current)
+    }
   }, [])
 
   return scrollY
@@ -56,16 +73,27 @@ export function useParallax() {
 
 export function useMouseParallax(intensity: number = 0.02) {
   const [position, setPosition] = useState({ x: 0, y: 0 })
+  const rafRef = useRef<number>(0)
 
   useEffect(() => {
+    let ticking = false
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX - window.innerWidth / 2) * intensity
-      const y = (e.clientY - window.innerHeight / 2) * intensity
-      setPosition({ x, y })
+      if (!ticking) {
+        rafRef.current = requestAnimationFrame(() => {
+          const x = (e.clientX - window.innerWidth / 2) * intensity
+          const y = (e.clientY - window.innerHeight / 2) * intensity
+          setPosition({ x, y })
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      cancelAnimationFrame(rafRef.current)
+    }
   }, [intensity])
 
   return position

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#1a1a2e" />
+    <meta name="robots" content="noindex" />
+    <title>404 – Page Not Found | Promoson Poudel</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: clip;
+        background-color: #1a1a2e;
+        color: #ffffff;
+        font-family: 'Courier New', monospace;
+      }
+      .wrap {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      .blocks {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 32px;
+      }
+      .block {
+        width: 32px;
+        height: 32px;
+        border: 3px solid #3c3c3c;
+        box-sizing: border-box;
+      }
+      .code {
+        font-size: 64px;
+        font-weight: bold;
+        color: #fcdb05;
+        letter-spacing: 6px;
+        margin: 0 0 8px;
+        text-shadow: 3px 3px 0 #3c3c3c;
+      }
+      h1 {
+        font-size: 20px;
+        color: #4aedd9;
+        margin: 0 0 16px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      p {
+        font-size: 18px;
+        color: #9ca3af;
+        margin: 0 0 32px;
+        max-width: 520px;
+        line-height: 1.6;
+      }
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #ffffff;
+        text-decoration: none;
+        background: linear-gradient(to bottom, #7f7f7f 0%, #5a5a5a 50%, #4a4a4a 100%);
+        border: 3px solid;
+        border-color: #a0a0a0 #3c3c3c #3c3c3c #a0a0a0;
+        text-shadow: 2px 2px 0 #3c3c3c;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: linear-gradient(to bottom, #9a9aff 0%, #6a6aff 50%, #5a5aff 100%);
+        border-color: #b0b0ff #4040aa #4040aa #b0b0ff;
+        transform: translateY(-2px);
+      }
+      .grass {
+        width: 100%;
+        height: 32px;
+        background: linear-gradient(to bottom, #5d8c3e 0%, #4a7a2e 40%, #8b6914 40%, #8b6914 100%);
+        margin-top: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="blocks">
+        <div class="block" style="background-color: #5d8c3e"></div>
+        <div class="block" style="background-color: #8b6914"></div>
+        <div class="block" style="background-color: #7f7f7f"></div>
+        <div class="block" style="background-color: #4aedd9"></div>
+      </div>
+
+      <div class="code">404</div>
+      <h1>Chunk Not Found</h1>
+      <p>
+        This page failed to generate (error: chunk_not_found). The block you are
+        looking for may have been mined or never existed.
+      </p>
+      <a class="btn" href="/"> Return to Home </a>
+      <div class="grass"></div>
+    </div>
+  </body>
+</html>

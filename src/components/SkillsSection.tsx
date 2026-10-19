@@ -96,7 +96,7 @@ export default function SkillsSection() {
 
   return (
     <section id="skills" className="py-20 px-4 relative">
-      <div className="absolute inset-0 bg-[#1a1a2e]/60 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 bg-[#1a1a2e]/70 backdrop-blur-[0.5px]" />
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section Title */}
@@ -121,7 +121,11 @@ export default function SkillsSection() {
             {skillCategories.map((cat, idx) => (
               <button
                 key={idx}
+                type="button"
                 onClick={() => setActiveCategory(idx)}
+                aria-pressed={activeCategory === idx}
+                aria-label={`Show ${cat.name.replace(/^[^\s]+\s/, '')} skills`}
+                title={cat.name.replace(/^[^\s]+\s/, '')}
                 className={`px-2 sm:px-3 py-2 text-xs sm:text-sm border-2 transition-all duration-300 ${
                   activeCategory === idx
                     ? 'bg-[#4A7A2E] border-[#6BAF4A] text-white scale-105 shadow-lg shadow-[#4A7A2E]/30'

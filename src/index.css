@@ -28,6 +28,19 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 56px;
+  /* Decorative layers (village, clouds) and scroll-in animations translate
+     horizontally past the viewport edge. Clip on <html> so the viewport
+     itself never becomes horizontally scrollable. */
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: 64px;
+  }
 }
 
 body {
@@ -35,11 +48,20 @@ body {
   background-color: #1a1a2e;
   color: #ffffff;
   overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
-h1, h2, h3, h4, h5, h6, .pixel-font {
-  font-family: 'Press Start 2P', cursive;
+/* The app root must never be wider than the viewport either, otherwise its
+   children (absolute-positioned decorations, animated cards) add scrollbar. */
+#root {
+  overflow-x: clip;
+  max-width: 100%;
 }
+
+  h1, h2, h3, h4, h5, h6, .pixel-font {
+    font-family: 'Press Start 2P', cursive;
+  }
 
 /* Minecraft button style */
 .mc-btn {
@@ -602,24 +624,31 @@ h1, h2, h3, h4, h5, h6, .pixel-font {
   }
 }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  /* Content visibility for performance */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1200px 800px;
   }
-  
-  .scroll-animate,
-  .scroll-animate-up,
-  .scroll-animate-left,
-  .scroll-animate-right,
-  .scroll-animate-scale,
-  .scroll-animate-rotate {
-    opacity: 1;
-    transform: none;
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    
+    .scroll-animate,
+    .scroll-animate-up,
+    .scroll-animate-left,
+    .scroll-animate-right,
+    .scroll-animate-scale,
+    .scroll-animate-rotate {
+      opacity: 1;
+      transform: none;
+    }
   }
-}
 
 /* Loading screen */
 @keyframes loading-bar {

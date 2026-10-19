@@ -1,14 +1,16 @@
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
+import playerAvatar from '../assets/player-avatar.svg'
 
 export default function AboutSection() {
   const titleAnim = useScrollAnimation()
+  const photoAnim = useScrollAnimation({ threshold: 0.2 })
   const contentAnim = useScrollAnimation({ threshold: 0.05 })
   const statsAnim = useScrollAnimation({ threshold: 0.2 })
 
   return (
     <section id="about" className="py-20 px-4 relative">
       {/* Semi-transparent background */}
-      <div className="absolute inset-0 bg-[#1a1a2e]/60 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 bg-[#1a1a2e]/70 backdrop-blur-[0.5px]" />
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section Title */}
@@ -20,6 +22,50 @@ export default function AboutSection() {
             📜 Player Stats
           </h2>
           <div className="w-32 h-1 bg-[#FCDB05] mx-auto" />
+        </div>
+
+        {/* Player photo card */}
+        <div
+          ref={photoAnim.ref}
+          className="mc-panel max-w-4xl mx-auto mb-6 scroll-animate-up"
+        >
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            {/* Portrait in an item slot */}
+            <div className="mc-slot w-32 h-32 sm:w-40 sm:h-40 shrink-0 border-4 border-[#FCDB05] shadow-[0_0_20px_rgba(252,219,5,0.35)] p-1">
+              <img
+                src={playerAvatar}
+                alt="Pixel-art portrait of Promoson Poudel"
+                width={160}
+                height={160}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Name plate */}
+            <div className="text-center sm:text-left min-w-0">
+              <p className="pixel-font text-[8px] text-gray-500 mb-2">
+                ▸ PLAYER PORTRAIT
+              </p>
+              <h3 className="pixel-font text-xs sm:text-sm text-[#FCDB05] mb-2 drop-shadow-[2px_2px_0px_#3C3C3C]">
+                Promoson Poudel
+              </h3>
+              <p className="text-base sm:text-lg text-[#4AEDD9] mb-1">
+                Senior Data Engineer • LVL 6+
+              </p>
+              <p className="text-sm text-gray-400">
+                Azure • AWS • GCP | 6+ Years | Healthcare, Finance, Insurance, Retail
+              </p>
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-3">
+                {['#4AEDD9', '#FCDB05', '#17DD62', '#B02E26'].map((color) => (
+                  <span
+                    key={color}
+                    className="w-4 h-4 border-2"
+                    style={{ backgroundColor: color, borderColor: `${color}88` }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* About Content - Book style */}
@@ -82,7 +128,7 @@ export default function AboutSection() {
         </div>
 
         {/* Hearts / Health bar */}
-        <div className="flex justify-center gap-1 mt-6">
+        <div className="flex justify-center gap-1 mt-6" aria-hidden="true">
           {Array.from({ length: 10 }).map((_, i) => (
             <span 
               key={i} 
