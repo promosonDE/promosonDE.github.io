@@ -7,6 +7,7 @@ const footerNav = [
   { id: 'skills', label: 'Inventory', icon: '🎒' },
   { id: 'experience', label: 'Quest Log', icon: '⚔️' },
   { id: 'education', label: 'Achievements', icon: '🏆' },
+  { id: 'contact', label: 'Contact', icon: '✉️' },
 ]
 
 const scrollToSection = (id: string) => {
@@ -112,7 +113,7 @@ export default function Footer() {
               © {currentYear} Promoson Poudel | Built with ❤️ and ⛏️
             </p>
             <p className="pixel-font text-[6px] sm:text-[7px] text-gray-500 mt-1">
-              Minecraft Style Portfolio
+              All rights reserved.
             </p>
           </div>
         </div>

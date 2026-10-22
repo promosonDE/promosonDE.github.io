@@ -10,6 +10,7 @@ const navItems = [
   { id: 'skills', label: 'Inventory', icon: '🎒' },
   { id: 'experience', label: 'Quests', icon: '⚔️' },
   { id: 'education', label: 'Achievements', icon: '🏆' },
+  { id: 'contact', label: 'Contact', icon: '✉️' },
 ]
 
 export default function Navbar({ activeSection }: NavbarProps) {
@@ -105,7 +106,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
 
         {/* Mobile Nav - only visible below lg (1024px) */}
         <div className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${
-          mobileOpen ? 'max-h-80 opacity-100 pb-4' : 'max-h-0 opacity-0'
+          mobileOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0'
         }`} id="mobile-nav">
           <div className="space-y-1 bg-[#1a1a2e]/80 backdrop-blur-sm rounded-b-lg p-2">
             {navItems.map((item, idx) => (

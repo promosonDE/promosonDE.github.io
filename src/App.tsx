@@ -5,6 +5,7 @@ import AboutSection from './components/AboutSection'
 import SkillsSection from './components/SkillsSection'
 import ExperienceSection from './components/ExperienceSection'
 import EducationSection from './components/EducationSection'
+import ContactSection from './components/ContactSection'
 import Footer from './components/Footer'
 import LoadingScreen from './components/LoadingScreen'
 import NotFound from './components/NotFound'
@@ -21,6 +22,7 @@ const SECTION_TITLES: Record<string, string> = {
   skills: 'Inventory | Promoson Poudel',
   experience: 'Quest Log | Promoson Poudel',
   education: 'Achievements | Promoson Poudel',
+  contact: 'Mailbox | Promoson Poudel',
 }
 
 /**
@@ -69,7 +71,7 @@ function App() {
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const sections = ['home', 'about', 'skills', 'experience', 'education']
+          const sections = ['home', 'about', 'skills', 'experience', 'education', 'contact']
           const scrollPosition = window.scrollY + 200
 
           for (const section of sections) {
@@ -141,6 +143,7 @@ function App() {
         <SkillsSection />
         <ExperienceSection />
         <EducationSection />
+        <ContactSection />
         <Footer />
       </main>
       

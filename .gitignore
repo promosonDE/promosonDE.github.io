@@ -3,3 +3,8 @@ node_modules/
 dist/
 build/
 *.log
+
+# Local environment files — may contain machine-specific config
+.env
+.env.local
+.env.*.local

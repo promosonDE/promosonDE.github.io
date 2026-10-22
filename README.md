@@ -46,6 +46,7 @@ bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host
 | `skills`     | Inventory    | 14 skill categories as expandable inventory grids    |
 | `experience` | Quest Log    | Roles with levels, XP bars, achievements, tech tags  |
 | `education`  | Achievements | Degrees + certifications with rarity tiers           |
+| `contact`    | Mailbox      | Contact form — name, email, message                   |
 | —            | Footer       | Nav, contact links, download CV                     |
 
 ### Interactive niceties
@@ -58,6 +59,9 @@ bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host
 - **One-click PDF résumé** — the CV is served straight from `src/assets` and downloaded as
   `Promoson_Poudel_CV.pdf`. No PDF library is shipped to the browser.
 - **Download button feedback** — idle → "CV Saved!" confirmation once the file is handed off.
+- **Working contact form** — name / email / message with client-side validation, a honeypot
+  against bots, and success / failure states. Submissions are forwarded to a form-to-email
+  provider and land in your inbox.
 - **Client-side 404** — unknown URLs render a themed *"Chunk Not Found"* screen instead of a
   blank page, with a matching static `public/404.html` for hosts that serve their own 404 page.
 - **Error boundary** — a render crash shows a themed *"Game Crashed"* screen with reload and
@@ -77,6 +81,7 @@ bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host
 | Build tool | Vite 6                                                     |
 | Styling    | Tailwind CSS 4 (`@tailwindcss/vite`) + custom CSS layer     |
 | PDF        | Static PDF asset (`src/assets`) — no client-side PDF library |
+| Contact    | Form-to-email provider (Formspree / Web3Forms / Basin)       |
 | Fonts      | Google Fonts — Press Start 2P, VT323                       |
 
 > The résumé is a pre-built PDF served as a static asset, so no PDF library is bundled at all.
@@ -123,10 +128,13 @@ npm run typecheck # tsc --noEmit, no output emitted
 ```
 promoson-portfolio/
 ├── index.html                  # Entry HTML: SEO/OG meta, CSP, fonts, #root mount
-├── vite.config.js              # Vite config (port 3000, manual chunks, es2020 target)
+├── vite.config.js              # Vite config (base path, port 3000, manual chunks, es2020)
 ├── tsconfig.json               # Strict TypeScript config
+├── .env.example                # Documents VITE_FORMSPREE_ID
+├── LAUNCH.md                   # Domain, hosting, HTTPS and go-live walkthrough
 ├── public/
 │   ├── 404.html                # Static "Chunk Not Found" page for static hosts
+│   ├── _headers                # Security + cache headers for Netlify / Cloudflare Pages
 │   └── favicon.svg             # Pixel-art grass block favicon
 └── src/
     ├── main.tsx                # React root + ErrorBoundary + StrictMode
@@ -143,6 +151,7 @@ promoson-portfolio/
     │   ├── SkillsSection.tsx   # "Inventory" — collapsible skill categories
     │   ├── ExperienceSection.tsx # "Quest Log" — roles, XP bars, achievements
     │   ├── EducationSection.tsx  # "Achievements" — degrees & certifications
+    │   ├── ContactSection.tsx    # "Mailbox" — contact form with validation
     │   ├── Footer.tsx          # Footer nav, contact, download CV
     │   ├── DownloadCVButton.tsx # Button state machine around the PDF download
     │   ├── LoadingScreen.tsx   # Progress bar + rotating tips
@@ -153,7 +162,10 @@ promoson-portfolio/
     │   └── MinecraftVillage.tsx   # Parallax village background
     ├── hooks/
     │   └── useScrollAnimation.ts  # useScrollAnimation, useParallax, useMouseParallax
+    ├── config/
+    │   └── contact.ts         # Form endpoint, inbox address, provider config
     └── utils/
+        ├── contact.ts          # Builds and POSTs the message for the active provider
         └── generateCV.ts       # Legacy jsPDF CV generator (reference only, not imported)
 ```
 
@@ -215,6 +227,62 @@ The résumé is a pre-built PDF checked into `src/assets`:
   activation behave natively.
 - Used in both the hero CTA row (`HeroSection.tsx`) and the footer (`Footer.tsx`).
 
+### Contact form (`src/components/ContactSection.tsx`)
+
+The site has no backend, so the "Mailbox" form posts to **Formspree**, which forwards each
+submission to `Promosonpoudel440@gmail.com`.
+
+**Setup:** follow [LAUNCH.md → Part 1](LAUNCH.md). In short — create a form at
+[formspree.io](https://formspree.io), then give its ID to the build. Preferred way, because
+it keeps the ID out of the repo and lets each deployment use a different form:
+
+```
+# .env.local (git-ignored) or your host's build environment
+VITE_FORMSPREE_ID=xxxxxxxx
+```
+
+Alternatively edit the fallback constant in `src/config/contact.ts`. Until either is set the
+form renders a "setup required" notice, disables the submit button, and points visitors at
+your direct email address — so it never looks broken on a live site.
+
+| Provider    | Endpoint                                | What you need                              | Free tier        |
+| ----------- | --------------------------------------- | ------------------------------------------ | ---------------- |
+| Formspree   | `https://formspree.io/f/<id>`           | Create a form, copy its ID                 | 50/mo            |
+| FormSubmit  | `https://formsubmit.co/ajax/<email>`    | Nothing — no account                       | Unlimited        |
+| Web3Forms   | `https://api.web3forms.com/submit`      | Access key → `FORM_EXTRA_FIELDS`           | 250/mo           |
+| Basin       | `https://usebasin.com/api/v1/<token>`   | Create a form, copy its token              | 100/mo           |
+
+Switching provider means changing `PROVIDER`, `FORM_ENDPOINT` and `FORM_ACTION` in
+`src/config/contact.ts` — nothing else:
+
+```ts
+// Web3Forms example — the provider needs its access key in the payload
+export const PROVIDER = 'web3forms'
+export const FORM_ENDPOINT = 'https://api.web3forms.com/submit'
+export const FORM_EXTRA_FIELDS = { access_key: 'YOUR_ACCESS_KEY' }
+```
+
+**How it works**
+- `src/config/contact.ts` — endpoint, inbox address, hidden fallback fields, provider extras,
+  and the `IS_FORM_CONFIGURED` flag that gates the form.
+- `src/utils/contact.ts` — builds the payload for the active provider, POSTs it form-encoded
+  with `Accept: application/json` (no CORS preflight), caps the wait at 30 seconds, and handles
+  both failure styles providers use (an HTTP error status, or HTTP 200 with `success: false`).
+  A 429 is translated into "too many messages" rather than the provider's raw wording.
+- Field names are provider-aware: Formspree wants `subject` and `_gotcha` and treats `email`
+  as Reply-To, while FormSubmit wants `_subject`, `_replyto` and `_honey`. Getting this wrong
+  fails silently, so it lives in one mapper instead of the component.
+- Client-side validation (required fields, email pattern, 10-character minimum) with per-field
+  messages, plus a honeypot field that silently absorbs bot submissions without a network call.
+- The inputs use `name="name"` / `name="email"` / `name="message"`, and the `<form>` has a real
+  `action`/`method`, so the no-JavaScript fallback still delivers correctly.
+- The Content-Security-Policy in `index.html` allows `connect-src` and `form-action` for
+  Formspree, FormSubmit and Web3Forms — add your provider's domain if you use another one.
+
+> **Restrict the endpoint.** It ships in the public JS bundle, so anyone can read it and post
+> to it. In Formspree open **Settings → Restrict to Domain** and list your domain. FormSubmit
+> has no equivalent, which is one reason Formspree is the default here.
+
 ---
 
 ## Deployment
@@ -249,6 +317,9 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_FORMSPREE_ID: ${{ vars.VITE_FORMSPREE_ID }}
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -263,12 +334,22 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
-> Set **Settings → Pages → Source** to *GitHub Actions*.
-> If you deploy to a project sub-path, add `base: '/promoson-portfolio/'` to `vite.config.js`.
+> Set **Settings → Pages → Source** to *GitHub Actions*, then add repository variables under
+> **Settings → Secrets and variables → Actions → Variables**:
+> `VITE_FORMSPREE_ID` (your Formspree form ID) and — only for a project sub-path like
+> `/promoson-portfolio/` — `VITE_BASE_PATH`. `vite.config.js` reads both at build time.
+> GitHub Pages cannot send custom headers, so `public/_headers` is ignored there.
 
 ### Netlify / Vercel / Cloudflare Pages
-Set the build command to `npm run build` and the publish directory to `dist`. No environment
-variables or server-side configuration are required.
+Build command `npm run build`, publish directory `dist`. Add `VITE_FORMSPREE_ID` as a build
+environment variable (and `NODE_VERSION=20` if the host defaults to something older).
+
+Netlify and Cloudflare Pages also read `public/_headers`, which adds real HTTP security headers
+(`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS)
+plus long-lived caching for the fingerprinted `assets/*` files.
+
+**Full walkthrough, including buying a domain and attaching it over HTTPS:**
+[LAUNCH.md](LAUNCH.md).
 
 ---
 
@@ -279,6 +360,10 @@ variables or server-side configuration are required.
 | Résumé content (roles, skills, certs)| `src/components/SkillsSection.tsx`, `ExperienceSection.tsx`, `EducationSection.tsx` |
 | The PDF résumé file                    | `src/assets/PROMOSON_POUDEL_MASTER_ALL.pdf`                  |
 | Bio and headline                      | `src/components/AboutSection.tsx`, `HeroSection.tsx`          |
+| Where visitor messages are delivered  | `VITE_FORMSPREE_ID` in `.env.local`, or `src/config/contact.ts` |
+| Recipient email address               | `src/config/contact.ts` (`CONTACT_EMAIL`)                     |
+| Security headers / asset caching      | `public/_headers`                                             |
+| Content-Security-Policy               | `index.html`                                                  |
 | Colours and block styles              | `src/index.css` (colour literals like `#5D8C3E`, `#FCDB05`)  |
 | Page title, meta and OG tags          | `index.html`                                                  |
 | Port, chunking, build target          | `vite.config.js`                                              |
@@ -297,8 +382,14 @@ the site never requires touching the JSX.
   `aria-expanded` / `aria-controls` on the mobile menu, and `aria-live` on the download button.
 - Visible focus states and keyboard-operable controls (including the logo, which responds to
   <kbd>Enter</kbd>/<kbd>Space</kbd>).
-- A **Content-Security-Policy** is declared in `index.html`, alongside
-  `Referrer-Policy: strict-origin-when-cross-origin` and a restrictive `Permissions-Policy`.
+- A **Content-Security-Policy** is declared in `index.html` (works on every host, including
+  GitHub Pages), alongside `Referrer-Policy: strict-origin-when-cross-origin` and a
+  restrictive `Permissions-Policy`.
+- `public/_headers` adds `X-Content-Type-Options`, `X-Frame-Options`, HSTS and
+  `Permissions-Policy` as real HTTP headers on hosts that support them (Netlify,
+  Cloudflare Pages), plus immutable caching for the fingerprinted assets.
+- HTTPS is expected in production; every recommended host provisions a free certificate
+  automatically. See [LAUNCH.md](LAUNCH.md).
 - SEO metadata: canonical title, description, Open Graph and Twitter Card tags.
 - The static `public/404.html` is marked `noindex`.
 

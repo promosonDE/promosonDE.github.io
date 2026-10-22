@@ -1,0 +1,23 @@
+# Security and caching headers for Netlify and Cloudflare Pages.
+#
+# These hosts read this file automatically from the build output. GitHub Pages
+# ignores it — see LAUNCH.md for what to do there instead.
+#
+# The Content-Security-Policy lives in the <meta> tag in index.html so that it
+# works on every host, including GitHub Pages, which cannot set headers.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Vite fingerprints these filenames, so a changed file always gets a new URL
+# and the old one can be cached forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The HTML shell must always be revalidated so a deploy is picked up at once.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

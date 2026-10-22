@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  # Lets you redeploy by hand after changing repository variables.
+  workflow_dispatch:
+
+# Required by the Pages deploy action.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; a newer commit supersedes an older one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Catches type errors before they reach the live site.
+      - run: npm run typecheck
+
+      - run: npm run build
+        env:
+          # A GitHub Pages *project* site is served from /<repo>/, so every
+          # asset URL needs that prefix. Delete this line once you attach a
+          # custom domain, since the site then lives at the root.
+          VITE_BASE_PATH: /promoson-portfolio/
+
+          # Set under Settings -> Secrets and variables -> Actions -> Variables.
+          # Empty is fine: the form then shows its "setup required" notice
+          # instead of failing silently.
+          VITE_FORMSPREE_ID: ${{ vars.VITE_FORMSPREE_ID }}
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
