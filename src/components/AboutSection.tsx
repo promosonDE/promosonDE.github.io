@@ -1,5 +1,5 @@
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
-import playerAvatar from '../assets/player-avatar.svg'
+import playerAvatar from '../assets/player-avatar.jpg'
 
 export default function AboutSection() {
   const titleAnim = useScrollAnimation()
@@ -34,7 +34,7 @@ export default function AboutSection() {
             <div className="mc-slot w-32 h-32 sm:w-40 sm:h-40 shrink-0 border-4 border-[#FCDB05] shadow-[0_0_20px_rgba(252,219,5,0.35)] p-1">
               <img
                 src={playerAvatar}
-                alt="Pixel-art portrait of Promoson Poudel"
+                alt="Portrait of Promoson Poudel"
                 width={160}
                 height={160}
                 className="w-full h-full object-cover"

@@ -55,10 +55,9 @@ bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host
 - **Dynamic browser title** — the tab title changes to match the section in view
   ("Inventory | Promoson Poudel", "Quest Log | Promoson Poudel", …).
 - **Active-section highlighting** in the navbar, throttled with `requestAnimationFrame`.
-- **On-demand PDF résumé** — the CV is generated client-side with jsPDF and downloaded as
-  `Promoson_Poudel_CV.pdf` (summary, skills, experience, education, certifications).
-  jsPDF is lazy-loaded, so it costs nothing on initial page load.
-- **Download button feedback** — idle → "Crafting PDF…" → "CV Saved!" / "Failed – Retry".
+- **One-click PDF résumé** — the CV is served straight from `src/assets` and downloaded as
+  `Promoson_Poudel_CV.pdf`. No PDF library is shipped to the browser.
+- **Download button feedback** — idle → "CV Saved!" confirmation once the file is handed off.
 - **Client-side 404** — unknown URLs render a themed *"Chunk Not Found"* screen instead of a
   blank page, with a matching static `public/404.html` for hosts that serve their own 404 page.
 - **Error boundary** — a render crash shows a themed *"Game Crashed"* screen with reload and
@@ -77,12 +76,12 @@ bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host
 | Language   | TypeScript 5.7 (`strict: true`)                            |
 | Build tool | Vite 6                                                     |
 | Styling    | Tailwind CSS 4 (`@tailwindcss/vite`) + custom CSS layer     |
-| PDF        | jsPDF 4 (lazy-loaded), jspdf-autotable                     |
+| PDF        | Static PDF asset (`src/assets`) — no client-side PDF library |
 | Fonts      | Google Fonts — Press Start 2P, VT323                       |
 
-> `jspdf-autotable` is installed as a dependency, but the résumé layout in
-> `src/utils/generateCV.ts` is hand-rolled with jsPDF primitives for full control over
-> pagination and hanging indents.
+> The résumé is a pre-built PDF served as a static asset, so no PDF library is bundled at all.
+> `src/utils/generateCV.ts` is a legacy jsPDF generator kept for reference — it is no longer
+> imported anywhere and is therefore excluded from the build.
 
 ---
 
@@ -135,7 +134,8 @@ promoson-portfolio/
     ├── index.css               # Tailwind + Minecraft utility classes & keyframes
     ├── vite-env.d.ts
     ├── assets/
-    │   └── player-avatar.svg   # Pixel-art portrait used in the "Player Portrait" slot
+    │   ├── player-avatar.jpg              # Portrait used in the "Player Portrait" slot
+    │   └── PROMOSON_POUDEL_MASTER_ALL.pdf # Résumé served by the "Download CV" button
     ├── components/
     │   ├── Navbar.tsx          # Fixed nav, active section, mobile drawer
     │   ├── HeroSection.tsx     # Landing hero with floating blocks & mouse parallax
@@ -154,7 +154,7 @@ promoson-portfolio/
     ├── hooks/
     │   └── useScrollAnimation.ts  # useScrollAnimation, useParallax, useMouseParallax
     └── utils/
-        └── generateCV.ts       # jsPDF CV generator (paginated, on demand)
+        └── generateCV.ts       # Legacy jsPDF CV generator (reference only, not imported)
 ```
 
 ---
@@ -198,24 +198,22 @@ Reusable Minecraft utilities are defined once and used throughout:
 | `.scroll-animate*` | Entrance animations driven by the `visible` class    |
 
 ### Performance
-- `jsPDF` is only fetched when the user clicks **Download CV** (`await import('jspdf')`).
+- The résumé PDF is a static asset — it is only fetched when the user clicks **Download CV**.
 - `vite.config.js` splits heavy vendor code into separate chunks:
-  - `jspdf` — the PDF library,
   - `react` — React + scheduler.
 - Scroll and mouse handlers are `passive` and throttled through `requestAnimationFrame`, so
   scrolling never blocks the main thread.
 - The build targets `es2020` and CSS is code-split.
 
-### CV generation (`src/utils/generateCV.ts`)
-`downloadCV()` builds the PDF at runtime with a small layout helper:
+### CV download (`src/components/DownloadCVButton.tsx`)
+The résumé is a pre-built PDF checked into `src/assets`:
 
-- A4 page, 20 mm margins, Helvetica throughout.
-- `ensure()` adds a new page whenever a block would overflow the bottom margin.
-- `centered()`, `wrapped()`, `bullet()` and `labeled()` helpers handle headings, paragraphs,
-  bulleted achievements (with hanging indent) and "label: value" rows.
-- Sections written: Professional Summary, Technical Skills, Professional Experience,
-  Education, Certifications.
-- The file is saved as `Promoson_Poudel_CV.pdf`.
+- `PROMOSON_POUDEL_MASTER_ALL.pdf` is imported as a module, so Vite fingerprints it and emits
+  it into `dist/assets/` under a content hash.
+- The `download` attribute renames it to `Promoson_Poudel_CV.pdf` in the browser's save dialog.
+- The button is an `<a>` styled with `.mc-btn`, so right-click → "Save as" and keyboard
+  activation behave natively.
+- Used in both the hero CTA row (`HeroSection.tsx`) and the footer (`Footer.tsx`).
 
 ---
 
@@ -279,7 +277,7 @@ variables or server-side configuration are required.
 | I want to change…                     | Where                                                        |
 | ------------------------------------- | ------------------------------------------------------------ |
 | Résumé content (roles, skills, certs)| `src/components/SkillsSection.tsx`, `ExperienceSection.tsx`, `EducationSection.tsx` |
-| The PDF résumé text                   | `src/utils/generateCV.ts`                                     |
+| The PDF résumé file                    | `src/assets/PROMOSON_POUDEL_MASTER_ALL.pdf`                  |
 | Bio and headline                      | `src/components/AboutSection.tsx`, `HeroSection.tsx`          |
 | Colours and block styles              | `src/index.css` (colour literals like `#5D8C3E`, `#FCDB05`)  |
 | Page title, meta and OG tags          | `index.html`                                                  |

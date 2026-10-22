@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { downloadCV } from '../utils/generateCV'
+import { useEffect, useRef, useState } from 'react'
+import cvPdf from '../assets/PROMOSON_POUDEL_MASTER_ALL.pdf'
 
-type DownloadState = 'idle' | 'working' | 'done' | 'error'
+type DownloadState = 'idle' | 'done'
 
 interface DownloadCVButtonProps {
   /** Extra classes (spacing, responsive sizing) merged into the base mc-btn. */
@@ -10,49 +10,40 @@ interface DownloadCVButtonProps {
   label?: string
 }
 
+/** Name the browser saves the file as (the source asset name is fingerprinted by Vite). */
+const CV_FILENAME = 'Promoson_Poudel_CV.pdf'
+
 /**
- * "Download CV" button with loading / success / failure feedback.
- * The PDF is generated on demand (jsPDF is lazy-loaded), so without this
- * a failed import would silently do nothing.
+ * "Download CV" link that serves the pre-built PDF résumé from `src/assets`.
+ * Vite fingerprints the asset and hands us its final URL at build time, so
+ * the `download` attribute gives the file a stable, human-readable name.
  */
 export default function DownloadCVButton({
   className = '',
   label = '📄 Download CV',
 }: DownloadCVButtonProps) {
   const [state, setState] = useState<DownloadState>('idle')
+  const resetTimer = useRef<ReturnType<typeof setTimeout>>()
 
-  const handleClick = async () => {
-    if (state === 'working') return
-    setState('working')
-    try {
-      await downloadCV()
-      setState('done')
-      setTimeout(() => setState('idle'), 2500)
-    } catch (err) {
-      console.error('Failed to generate CV:', err)
-      setState('error')
-      setTimeout(() => setState('idle'), 3500)
-    }
+  useEffect(() => () => clearTimeout(resetTimer.current), [])
+
+  const handleClick = () => {
+    setState('done')
+    clearTimeout(resetTimer.current)
+    resetTimer.current = setTimeout(() => setState('idle'), 2500)
   }
 
-  const text =
-    state === 'working'
-      ? '⏳ Crafting PDF…'
-      : state === 'done'
-        ? '✅ CV Saved!'
-        : state === 'error'
-          ? '⚠️ Failed – Retry'
-          : label
+  const text = state === 'done' ? '✅ CV Saved!' : label
 
   return (
-    <button
-      type="button"
+    <a
+      href={cvPdf}
+      download={CV_FILENAME}
       onClick={handleClick}
-      disabled={state === 'working'}
       aria-live="polite"
-      className={`mc-btn bg-[#4A7A2E] hover:bg-[#5D8C3E] disabled:opacity-70 disabled:cursor-wait ${className}`}
+      className={`mc-btn bg-[#4A7A2E] hover:bg-[#5D8C3E] ${className}`}
     >
       {text}
-    </button>
+    </a>
   )
 }
