@@ -75,7 +75,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
               <button
                 key={item.id}
                 onClick={() => scrollTo(item.id)}
-                className={`px-3 py-2 pixel-font text-[9px] border-2 transition-all duration-300 ${
+                className={`px-3 py-2 pixel-font text-[9px] border-2 transition-all duration-200 ${
                   activeSection === item.id
                     ? 'bg-[#4A7A2E]/80 border-[#6BAF4A] text-white scale-105 shadow-lg shadow-[#4A7A2E]/30 backdrop-blur-sm'
                     : 'bg-black/30 border-[#7F7F7F]/50 text-gray-300 hover:bg-black/50 hover:border-[#9F9F9F] hover:scale-105 backdrop-blur-sm'

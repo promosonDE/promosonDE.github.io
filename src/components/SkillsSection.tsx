@@ -152,9 +152,7 @@ export default function SkillsSection() {
                   className="mc-slot mc-block group scroll-animate-scale"
                   title={skill}
                   style={{ 
-                    animationDelay: `${idx * 0.05}s`,
-                    opacity: 1,
-                    transform: 'scale(1)',
+                    animationDelay: `${idx * 0.03}s`,
                   }}
                 >
                   <span className="text-xs sm:text-sm text-center text-gray-200 group-hover:text-white transition-colors">

@@ -122,7 +122,7 @@ export default function HeroSection() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 animate-bounce" style={{ animationDuration: '2s' }}>
-        <div className="pixel-font text-xs text-gray-400">▼ Scroll Down ▼</div>
+        <div className="pixel-font text-xs text-gray-400 transition-colors hover:text-[#4AEDD9]">▼ Scroll Down ▼</div>
       </div>
 
       {/* Section divider */}

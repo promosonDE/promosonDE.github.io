@@ -179,7 +179,7 @@ function BackToTop() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-6 right-6 z-50 mc-btn text-xs animate-bounce"
+      className="fixed bottom-6 right-6 z-50 mc-btn text-xs animate-bounce transition-transform hover:scale-105"
       style={{ animationDuration: '2s' }}
       aria-label="Back to top"
     >
