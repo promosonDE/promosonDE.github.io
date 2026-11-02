@@ -347,6 +347,12 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
+> **Pages needs a public repo on the free plan.** If the deploy fails with *"Your current plan
+> does not support GitHub Pages for this repository"*, either change the repository visibility
+> (Settings → General → Danger Zone → Change visibility) or use Netlify / Cloudflare Pages /
+> Vercel, which serve private repos for free. GitHub Pro and the Student Developer Pack also
+> unlock Pages for private repos.
+>
 > Set **Settings → Pages → Source** to *GitHub Actions*, then add repository variables under
 > **Settings → Secrets and variables → Actions → Variables**:
 > `VITE_FORMSPREE_ID` (your Formspree form ID) and, only when the site does not live at

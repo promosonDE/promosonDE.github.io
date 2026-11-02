@@ -163,6 +163,12 @@ Also free, also honours `_headers`, also drag-and-drop friendly.
 Free and already where your code lives, but it ignores `_headers`, so you get the
 `<meta>` CSP and nothing else. Still perfectly secure for a static portfolio.
 
+> **Free accounts:** GitHub Pages is only available for **public** repositories
+> unless you have GitHub Pro (the Student Developer Pack includes it). If the
+> deploy fails with *"Your current plan does not support GitHub Pages for this
+> repository"*, either make the repo public (Settings → General → Danger Zone)
+> or use Cloudflare Pages / Netlify / Vercel, which serve private repos for free.
+
 1. Push the repo to GitHub.
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**. The
    workflow is already in `.github/workflows/deploy.yml`; it builds and publishes
@@ -301,6 +307,9 @@ npm audit
 - [ ] Custom domain resolves, and `www` resolves too
 - [ ] Favicon appears in the browser tab
 - [ ] Lighthouse (DevTools → Lighthouse) — aim for 90+ on Performance, Accessibility, Best Practices, SEO
+- [ ] Change `og:image` / `twitter:image` in `index.html` from `/og-image.png` to the
+      absolute production URL (`https://yourdomain.com/og-image.png`) so social
+      scrapers can fetch it
 - [ ] Add the live URL to your LinkedIn, GitHub profile and CV
 - [ ] Submit the site to [Google Search Console](https://search.google.com/search-console) so it gets indexed
 
