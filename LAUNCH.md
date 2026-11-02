@@ -126,7 +126,7 @@ First, put the project on GitHub (skip if it's already there):
 git add -A
 git commit -m "Add contact form, CV download, and launch config"
 git remote add origin https://github.com/<your-username>/<repo>.git
-git push -u origin master
+git push -u origin main
 ```
 
 ### Option A — Cloudflare Pages (recommended)
@@ -172,7 +172,7 @@ Free and already where your code lives, but it ignores `_headers`, so you get th
 1. Push the repo to GitHub.
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**. The
    workflow is already in `.github/workflows/deploy.yml`; it builds and publishes
-   `dist` on every push to `master`.
+   `dist` on every push to `main`.
 3. Add the form ID under **Settings → Secrets and variables → Actions →
    Variables**:
 

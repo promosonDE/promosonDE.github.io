@@ -316,7 +316,7 @@ A minimal workflow (`.github/workflows/deploy.yml`):
 name: Deploy to GitHub Pages
 on:
   push:
-    branches: [master]
+    branches: [main]
 permissions:
   contents: read
   pages: write
