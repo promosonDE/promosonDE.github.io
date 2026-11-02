@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import AboutSection from './components/AboutSection'
+import ImpactSection from './components/ImpactSection'
 import SkillsSection from './components/SkillsSection'
 import ExperienceSection from './components/ExperienceSection'
 import EducationSection from './components/EducationSection'
@@ -13,17 +14,21 @@ import Particles from './components/Particles'
 import MinecraftCharacter from './components/MinecraftCharacter'
 import MinecraftVillage from './components/MinecraftVillage'
 
-const BASE_TITLE = 'Promoson Poudel | Senior Data Engineer Portfolio'
+const BASE_TITLE = 'Promoson Poudel | Senior Data Engineer — Azure, Databricks & Snowflake'
 
 /** Browser tab title for each in-page section. */
 const SECTION_TITLES: Record<string, string> = {
   home: BASE_TITLE,
   about: 'Player Stats | Promoson Poudel',
-  skills: 'Inventory | Promoson Poudel',
-  experience: 'Quest Log | Promoson Poudel',
-  education: 'Achievements | Promoson Poudel',
-  contact: 'Mailbox | Promoson Poudel',
+  impact: 'Impact & Blueprint | Promoson Poudel',
+  skills: 'Skills Inventory | Promoson Poudel',
+  experience: 'Experience — Quest Log | Promoson Poudel',
+  education: 'Education & Certifications | Promoson Poudel',
+  contact: 'Contact | Promoson Poudel',
 }
+
+/** Sections in document order — used by the scroll spy. */
+const SECTION_IDS = ['home', 'about', 'impact', 'skills', 'experience', 'education', 'contact']
 
 /**
  * This is a single-page site with no router, so any URL that is not the site
@@ -48,15 +53,31 @@ function isUnknownPath(): boolean {
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => {
+    if (typeof window === 'undefined') return true
+    try {
+      // The themed loading screen is a nice first impression, but showing it
+      // on every internal navigation is annoying. Once per session is plenty.
+      return sessionStorage.getItem('pp-visited') !== '1'
+    } catch {
+      return true
+    }
+  })
   const [isNotFound] = useState(isUnknownPath)
 
   // Loading screen (skipped on the 404 page)
   useEffect(() => {
-    if (isNotFound) return
-    const timer = setTimeout(() => setIsLoading(false), 2200)
+    if (isNotFound || !isLoading) return
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+      try {
+        sessionStorage.setItem('pp-visited', '1')
+      } catch {
+        // Storage can be disabled; the gate still closes.
+      }
+    }, 1800)
     return () => clearTimeout(timer)
-  }, [isNotFound])
+  }, [isNotFound, isLoading])
 
   // Page title follows the section currently in view
   useEffect(() => {
@@ -71,10 +92,9 @@ function App() {
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const sections = ['home', 'about', 'skills', 'experience', 'education', 'contact']
           const scrollPosition = window.scrollY + 200
 
-          for (const section of sections) {
+          for (const section of SECTION_IDS) {
             const element = document.getElementById(section)
             if (element) {
               const { offsetTop, offsetHeight } = element
@@ -127,6 +147,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#1a1a2e] relative">
+      {/* Keyboard users can jump straight to the content */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* Minecraft Village Background */}
       <MinecraftVillage />
       
@@ -137,9 +162,10 @@ function App() {
       <Navbar activeSection={activeSection} />
       
       {/* Main Content */}
-      <main className="relative z-10">
+      <main id="main-content" tabIndex={-1} className="relative z-10 outline-none">
         <HeroSection />
         <AboutSection />
+        <ImpactSection />
         <SkillsSection />
         <ExperienceSection />
         <EducationSection />

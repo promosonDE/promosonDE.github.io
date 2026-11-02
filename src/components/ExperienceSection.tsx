@@ -1,170 +1,122 @@
 import { useState } from 'react'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
-
-const experiences = [
-  {
-    title: 'Senior Data Engineer',
-    company: 'Elevance Health',
-    location: 'Indianapolis, IN',
-    period: 'May 2024 – Present',
-    icon: '🏥',
-    color: '#4AEDD9',
-    level: 'LVL 6',
-    xp: '95%',
-    description: 'Enterprise Healthcare Data Modernization team, designing a scalable healthcare lakehouse platform supporting 120M+ claims records daily.',
-    achievements: [
-      'Designed scalable healthcare lakehouse platform using Azure Data Lake Gen2, Azure Databricks, Delta Lake, and Snowflake',
-      'Re-engineered fragmented ingestion workflows into standardized Bronze/Silver/Gold architecture, improving data freshness by 35%',
-      'Optimized large-scale PySpark workloads, reducing pipeline runtime by 35-40%',
-      'Enhanced Snowflake performance reducing annual warehouse spend by 25-30%',
-      'Improved production reliability, reducing recurring pipeline failures by 40%',
-      'Supported AI/ML and RAG pipeline initiatives with governed, curated datasets',
-      'Implemented real-time validation workflows using Azure Event Grid and Azure Functions',
-      'Automated infrastructure provisioning using Terraform and CI/CD pipelines',
-      'Mentored data engineers through architecture reviews and optimization sessions',
-    ],
-    tech: ['Azure Data Factory', 'Azure Databricks', 'Snowflake', 'Delta Lake', 'PySpark', 'dbt', 'Terraform', 'Power BI', 'Great Expectations', 'AWS S3'],
-  },
-  {
-    title: 'Data Engineer',
-    company: 'MetLife',
-    location: 'New York City, NY',
-    period: 'Mar 2023 – Apr 2024',
-    icon: '🛡️',
-    color: '#FCDB05',
-    level: 'LVL 5',
-    xp: '80%',
-    description: 'Insurance data platform team modernizing policy, claims, underwriting, actuarial, and customer analytics data pipelines.',
-    achievements: [
-      'Developed ingestion pipelines for policy, claims, billing, and underwriting datasets using AWS Glue, S3, PySpark',
-      'Re-engineered legacy SSIS workflows into scalable PySpark transformation jobs',
-      'Built structured data lake zones for raw, enriched, and curated datasets',
-      'Created transformation logic in Databricks using Delta Lake and merge patterns',
-      'Developed modular dbt models for curated data marts',
-      'Supported event-driven data processing using Kinesis and Lambda',
-      'Created SQL-based datasets for Power BI and Tableau dashboards',
-      'Prepared datasets to support AI/ML fraud analytics and risk scoring',
-    ],
-    tech: ['AWS Glue', 'Amazon S3', 'Kinesis', 'Lambda', 'Redshift', 'Snowflake', 'Databricks', 'Delta Lake', 'Airflow', 'Terraform', 'dbt', 'PySpark'],
-  },
-  {
-    title: 'ETL Developer',
-    company: 'Home Depot',
-    location: 'Atlanta, GA',
-    period: 'Sept 2019 – Feb 2023',
-    icon: '🏠',
-    color: '#17DD62',
-    level: 'LVL 3',
-    xp: '70%',
-    description: 'Retail Data and Supply Chain Analytics team, supporting ETL development for sales, inventory, merchandising, pricing, and supplier datasets.',
-    achievements: [
-      'Developed and maintained ETL workflows using Informatica PowerCenter, SSIS, SQL Server, Oracle, Teradata',
-      'Created source-to-target mappings, transformation logic, and data validation checks',
-      'Built SQL-based transformation logic using T-SQL, PL/SQL, stored procedures',
-      'Supported performance tuning of ETL jobs and optimized joins',
-      'Implemented SCD Type 1 and Type 2 logic for dimension tables',
-      'Created reconciliation scripts using SQL and Shell Scripting',
-      'Assisted in building star schema and snowflake schema structures',
-      'Supported report-ready datasets for SSRS, Crystal Reports, Power BI',
-    ],
-    tech: ['Informatica PowerCenter', 'SSIS', 'SQL Server', 'Oracle', 'Teradata', 'PL/SQL', 'Bash', 'Crystal Reports', 'SSRS', 'SCD', 'TFS'],
-  },
-]
+import SectionHeading from './SectionHeading'
+import { experiences } from '../data/resume'
 
 export default function ExperienceSection() {
-  const [expandedIdx, setExpandedIdx] = useState(0)
-  const titleAnim = useScrollAnimation()
+  const [expanded, setExpanded] = useState<number[]>([0])
+
+  const allExpanded = expanded.length === experiences.length
+
+  const toggle = (index: number) => {
+    setExpanded((current) =>
+      current.includes(index) ? current.filter((item) => item !== index) : [...current, index]
+    )
+  }
 
   return (
     <section id="experience" className="py-20 px-4 relative">
-      <div className="absolute inset-0 bg-[#1a1a2e]/70 backdrop-blur-[0.5px]" />
-      
+      <div className="absolute inset-0 bg-[#1a1a2e]/75 backdrop-blur-[0.5px]" />
+
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Section Title */}
-        <div 
-          ref={titleAnim.ref}
-          className="text-center mb-12 scroll-animate-up"
-        >
-          <h2 className="pixel-font text-xl sm:text-2xl text-[#FCDB05] mb-4 drop-shadow-[2px_2px_0px_#3C3C3C]">
-            ⚔️ Quest Log
-          </h2>
-          <p className="text-gray-400 text-lg">Professional Experience</p>
-          <div className="w-32 h-1 bg-[#FCDB05] mx-auto mt-4" />
+        <SectionHeading
+          eyebrow="▸ 2019 — PRESENT"
+          title="⚔️ Quest Log"
+          subtitle="Three roles, one through-line: reliable data platforms at enterprise scale."
+        />
+
+        {/* Quest controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8 scroll-animate-up">
+          <p className="text-center sm:text-left text-sm sm:text-base text-gray-400">
+            <span className="text-[#FCDB05] font-bold">{experiences.length} roles</span>
+            {' • '}
+            {experiences.reduce((total, role) => total + role.achievements.length, 0)} documented
+            achievements
+          </p>
+          <div className="flex flex-wrap justify-center sm:justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setExpanded(allExpanded ? [] : experiences.map((_, index) => index))}
+              className="mc-btn text-[9px] sm:text-xs"
+              aria-label={allExpanded ? 'Collapse all quests' : 'Expand all quests'}
+            >
+              {allExpanded ? '▲ Collapse All' : '▼ Expand All'}
+            </button>
+          </div>
         </div>
 
         {/* Timeline */}
         <div className="relative">
-          {/* Timeline line */}
           <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 timeline-line transform md:-translate-x-1/2" />
 
           {experiences.map((exp, idx) => (
-            <ExperienceCard 
-              key={idx} 
-              exp={exp} 
-              idx={idx} 
-              expandedIdx={expandedIdx}
-              setExpandedIdx={setExpandedIdx}
+            <ExperienceCard
+              key={`${exp.company}-${exp.title}`}
+              exp={exp}
+              idx={idx}
+              isExpanded={expanded.includes(idx)}
+              onToggle={() => toggle(idx)}
             />
           ))}
         </div>
       </div>
 
-      {/* Section divider */}
       <div className="absolute bottom-0 left-0 right-0 section-divider" />
     </section>
   )
 }
 
 interface ExperienceCardProps {
-  exp: typeof experiences[0]
+  exp: (typeof experiences)[0]
   idx: number
-  expandedIdx: number
-  setExpandedIdx: (idx: number) => void
+  isExpanded: boolean
+  onToggle: () => void
 }
 
-function ExperienceCard({ exp, idx, expandedIdx, setExpandedIdx }: ExperienceCardProps) {
+function ExperienceCard({ exp, idx, isExpanded, onToggle }: ExperienceCardProps) {
   const cardAnim = useScrollAnimation({ threshold: 0.1 })
-  const isExpanded = expandedIdx === idx
 
   return (
-    <div 
+    <div
       ref={cardAnim.ref}
       className={`relative mb-12 md:mb-16 ${idx % 2 === 0 ? 'md:pr-[52%]' : 'md:pl-[52%]'} ${idx % 2 === 0 ? 'scroll-animate-left' : 'scroll-animate-right'}`}
     >
       {/* Timeline dot */}
-      <div 
+      <div
         className="absolute left-[14px] md:left-1/2 w-5 h-5 border-2 transform md:-translate-x-1/2 z-10 transition-all duration-500"
-        style={{ 
+        style={{
           backgroundColor: isExpanded ? exp.color : 'transparent',
           borderColor: exp.color,
           boxShadow: isExpanded ? `0 0 15px ${exp.color}, 0 0 30px ${exp.color}` : `0 0 5px ${exp.color}`,
         }}
+        aria-hidden="true"
       />
 
-      {/* Quest card - toggleable, so expose it as a real button */}
-      <div 
+      <div
         className={`ml-12 md:ml-0 mc-panel mc-block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FCDB05] ${idx % 2 === 0 ? 'md:mr-4' : 'md:ml-4'}`}
         role="button"
         tabIndex={0}
         aria-expanded={isExpanded}
+        aria-controls={`quest-details-${idx}`}
         aria-label={`${isExpanded ? 'Collapse' : 'Expand'} quest details for ${exp.title} at ${exp.company}`}
-        onClick={() => setExpandedIdx(isExpanded ? -1 : idx)}
+        onClick={onToggle}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
-            setExpandedIdx(isExpanded ? -1 : idx)
+            onToggle()
           }
         }}
       >
         {/* Quest header */}
         <div className="flex items-start gap-3 mb-3">
-          <div 
+          <div
             className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center border-2 text-xl sm:text-2xl shrink-0 transition-all duration-300"
-            style={{ 
-              backgroundColor: isExpanded ? `${exp.color}30` : `${exp.color}10`, 
+            style={{
+              backgroundColor: isExpanded ? `${exp.color}30` : `${exp.color}10`,
               borderColor: exp.color,
               transform: isExpanded ? 'scale(1.1) rotate(5deg)' : 'scale(1) rotate(0deg)',
             }}
+            aria-hidden="true"
           >
             {exp.icon}
           </div>
@@ -173,60 +125,80 @@ function ExperienceCard({ exp, idx, expandedIdx, setExpandedIdx }: ExperienceCar
               {exp.title}
             </h3>
             <p className="text-white text-base sm:text-lg font-bold truncate">{exp.company}</p>
-            <p className="text-gray-400 text-xs sm:text-sm">{exp.location} • {exp.period}</p>
+            <p className="text-gray-400 text-xs sm:text-sm">
+              {exp.location} • {exp.period}
+            </p>
           </div>
           <div className="text-right shrink-0">
-            <span className="pixel-font text-[8px] sm:text-[10px]" style={{ color: exp.color }}>{exp.level}</span>
+            <span className="pixel-font text-[8px] sm:text-[10px]" style={{ color: exp.color }}>
+              {exp.level}
+            </span>
             <div className="w-12 sm:w-16 xp-bar mt-1">
               <div className="xp-bar-fill" style={{ width: exp.xp }} />
             </div>
           </div>
         </div>
 
-        {/* Quest description */}
-        <p className="text-gray-300 text-sm sm:text-base mb-3">{exp.description}</p>
+        {/* Outcome + summary */}
+        <p
+          className="text-xs sm:text-sm font-bold mb-2 flex items-start gap-1.5"
+          style={{ color: exp.color }}
+        >
+          <span aria-hidden="true">✦</span>
+          <span>{exp.headline}</span>
+        </p>
+        <p className="text-gray-300 text-sm sm:text-base mb-3">{exp.summary}</p>
 
         {/* Expanded content */}
-        <div 
-          className={`overflow-hidden transition-all duration-500 ease-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
+        <div
+          id={`quest-details-${idx}`}
+          className={`grid transition-all duration-500 ease-out ${
+            isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
         >
-          <div className="pt-4 border-t border-[#5A5A5A]">
-            <h4 className="pixel-font text-[10px] text-[#FCDB05] mb-3">📋 Quest Objectives:</h4>
-            <ul className="space-y-2 mb-4">
-              {exp.achievements.map((achievement, aidx) => (
-                <li 
-                  key={aidx} 
-                  className="flex items-start gap-2 text-gray-300 text-sm sm:text-base transition-all duration-300"
-                  style={{ 
-                    transitionDelay: isExpanded ? `${aidx * 0.05}s` : '0s',
-                    opacity: isExpanded ? 1 : 0,
-                    transform: isExpanded ? 'translateX(0)' : 'translateX(-10px)',
-                  }}
-                >
-                  <span className="text-[#17DD62] mt-0.5 shrink-0">✦</span>
-                  <span>{achievement}</span>
-                </li>
-              ))}
-            </ul>
-
-            {/* Tech stack */}
-            <div className="mt-4 pt-3 border-t border-[#5A5A5A]">
-              <h4 className="pixel-font text-[10px] text-gray-400 mb-2">🔧 Loot Drops:</h4>
-              <div className="flex flex-wrap gap-1">
-                {exp.tech.map((t, tidx) => (
-                  <span 
-                    key={tidx} 
-                    className="text-xs px-2 py-1 border transition-all duration-300 hover:scale-105"
-                    style={{ 
-                      backgroundColor: `${exp.color}15`, 
-                      borderColor: `${exp.color}40`,
-                      color: exp.color,
-                      transitionDelay: isExpanded ? `${tidx * 0.03}s` : '0s',
+          <div className="min-h-0 overflow-hidden">
+            <div className="pt-4 border-t border-[#5A5A5A]">
+              <h4 className="pixel-font text-[10px] text-[#FCDB05] mb-3">
+                📋 Quest Objectives ({exp.achievements.length})
+              </h4>
+              <ul className="space-y-2.5 mb-4">
+                {exp.achievements.map((achievement, aidx) => (
+                  <li
+                    key={aidx}
+                    className="flex items-start gap-2 text-gray-300 text-sm sm:text-base transition-all duration-300"
+                    style={{
+                      transitionDelay: isExpanded ? `${Math.min(aidx * 0.03, 0.4)}s` : '0s',
+                      opacity: isExpanded ? 1 : 0,
+                      transform: isExpanded ? 'translateX(0)' : 'translateX(-10px)',
                     }}
                   >
-                    {t}
-                  </span>
+                    <span className="text-[#17DD62] mt-0.5 shrink-0" aria-hidden="true">✦</span>
+                    <span>{achievement}</span>
+                  </li>
                 ))}
+              </ul>
+
+              {/* Tech stack */}
+              <div className="mt-4 pt-3 border-t border-[#5A5A5A]">
+                <h4 className="pixel-font text-[10px] text-gray-400 mb-2">
+                  🔧 Key Technologies ({exp.tech.length})
+                </h4>
+                <div className="flex flex-wrap gap-1">
+                  {exp.tech.map((tech, tidx) => (
+                    <span
+                      key={tech}
+                      className="text-xs px-2 py-1 border transition-all duration-300 hover:scale-105"
+                      style={{
+                        backgroundColor: `${exp.color}15`,
+                        borderColor: `${exp.color}40`,
+                        color: exp.color,
+                        transitionDelay: isExpanded ? `${Math.min(tidx * 0.02, 0.3)}s` : '0s',
+                      }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -234,7 +206,7 @@ function ExperienceCard({ exp, idx, expandedIdx, setExpandedIdx }: ExperienceCar
 
         {/* Click indicator */}
         <div className="text-center mt-2">
-          <span className="pixel-font text-[8px] text-gray-500 transition-all duration-300">
+          <span className="pixel-font text-[8px] text-gray-400 transition-all duration-300">
             {isExpanded ? '▲ Click to collapse ▲' : '▼ Click to expand ▼'}
           </span>
         </div>

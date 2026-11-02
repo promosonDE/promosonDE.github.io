@@ -15,7 +15,8 @@ export default function NotFound() {
   }, [])
 
   const goHome = () => {
-    window.location.assign('/')
+    // BASE_URL keeps the home link correct on sub-path deployments.
+    window.location.assign(import.meta.env.BASE_URL || '/')
   }
 
   const goBack = () => {

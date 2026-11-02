@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#1a1a2e" />
     <meta name="robots" content="noindex" />
     <title>404 – Page Not Found | Promoson Poudel</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link id="favicon" rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
       html,
       body {
@@ -104,8 +104,27 @@
         This page failed to generate (error: chunk_not_found). The block you are
         looking for may have been mined or never existed.
       </p>
-      <a class="btn" href="./"> Return to Home </a>
+      <a class="btn" id="home-link" href="/"> Return to Home </a>
       <div class="grass"></div>
     </div>
+
+    <script>
+      // This file is served for every unknown URL, including deep ones, so a
+      // relative link would point at the missing folder. GitHub Pages *project*
+      // sites live under /<repo>/, while custom domains live at the root; probe
+      // the first path segment and use it only when it actually serves the site.
+      (function () {
+        var segment = location.pathname.split('/').filter(Boolean)[0];
+        if (!segment) return;
+        var base = '/' + segment + '/';
+        fetch(base, { method: 'HEAD' })
+          .then(function (response) {
+            if (!response.ok) return;
+            document.getElementById('home-link').href = base;
+            document.getElementById('favicon').href = base + 'favicon.svg';
+          })
+          .catch(function () {});
+      })();
+    </script>
   </body>
 </html>

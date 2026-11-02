@@ -126,7 +126,7 @@ First, put the project on GitHub (skip if it's already there):
 git add -A
 git commit -m "Add contact form, CV download, and launch config"
 git remote add origin https://github.com/<your-username>/<repo>.git
-git push -u origin main
+git push -u origin master
 ```
 
 ### Option A — Cloudflare Pages (recommended)
@@ -146,8 +146,8 @@ file in this repo (real HTTP security headers, not just the `<meta>` CSP).
 5. **Save and Deploy.** You get a live URL like `promoson.pages.dev` over HTTPS
    within a minute.
 
-Every `git push` to `main` redeploys automatically, and pull requests get their
-own preview URL.
+Every `git push` to your default branch redeploys automatically, and pull
+requests get their own preview URL.
 
 ### Option B — Netlify
 
@@ -164,19 +164,23 @@ Free and already where your code lives, but it ignores `_headers`, so you get th
 `<meta>` CSP and nothing else. Still perfectly secure for a static portfolio.
 
 1. Push the repo to GitHub.
-2. **Settings → Pages → Build and deployment → Source: GitHub Actions**, then
-   choose the **Vite** starter workflow. It builds and publishes `dist`.
-3. **If you are *not* using a custom domain**, the site lives at
-   `https://<username>.github.io/<repo>/`. Vite needs to know about that path or
-   every asset 404s and you get a blank page:
+2. **Settings → Pages → Build and deployment → Source: GitHub Actions**. The
+   workflow is already in `.github/workflows/deploy.yml`; it builds and publishes
+   `dist` on every push to `master`.
+3. Add the form ID under **Settings → Secrets and variables → Actions →
+   Variables**:
 
    ```
-   Settings → Secrets and variables → Actions → Variables
-   New variable: VITE_BASE_PATH = /<repo>/
+   New variable: VITE_FORMSPREE_ID = your-form-id
    ```
 
-   The workflow must pass it through as an env var on the build step. With a
-   custom domain you can skip this — the site sits at the root.
+4. **If you are *not* using a custom domain**, the site lives at
+   `https://<username>.github.io/<repo>/` (`/promoson-portfolio/` for this
+   repo). The workflow already defaults the base path to that, so assets
+   resolve without extra setup. Once you attach a custom domain the site sits at
+   the root: add a repository variable `VITE_BASE_PATH` set to `/` to override
+   the default. Without the correct base path every asset 404s and you get a
+   blank page.
 
 ### Option D — Vercel
 
@@ -288,7 +292,7 @@ npm audit
 
 - [ ] `npm run build` succeeds and `npm run typecheck` is silent
 - [ ] Contact form delivers to your inbox; **Reply** addresses the visitor
-- [ ] The form refuses to send while `VITE_FORMSPREE_ID` is unset (setup notice shown)
+- [ ] The Formspree ID is set in the host's build environment (the form shows no setup notice)
 - [ ] **Download CV** downloads the PDF and it opens correctly
 - [ ] Your photo renders in the About section
 - [ ] Every nav link scrolls to the right section, on desktop and mobile

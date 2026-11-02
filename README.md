@@ -39,17 +39,24 @@ bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host
   "data-engineering" tips (`LoadingScreen.tsx`).
 
 ### Portfolio content
-| Section      | Nav label    | Content                                             |
-| ------------ | ------------ | --------------------------------------------------- |
-| `home`       | Home         | Hero, name plate, headline, CTAs                    |
-| `about`      | Player Stats | Portrait, bio, years of experience, key stats       |
-| `skills`     | Inventory    | 14 skill categories as expandable inventory grids    |
-| `experience` | Quest Log    | Roles with levels, XP bars, achievements, tech tags  |
-| `education`  | Achievements | Degrees + certifications with rarity tiers           |
-| `contact`    | Mailbox      | Contact form — name, email, message                   |
-| —            | Footer       | Nav, contact links, download CV                     |
+| Section      | Nav label    | Content                                                       |
+| ------------ | ------------ | ------------------------------------------------------------- |
+| `home`       | Home         | Hero, name plate, headline, stats strip, CTAs                 |
+| `about`      | Player Stats | Portrait, full professional summary, focus areas, quick facts |
+| `impact`     | Impact       | Measured outcomes, platform blueprint, case studies, capabilities |
+| `skills`     | Inventory    | 22 searchable skill categories + complete skill matrix        |
+| `experience` | Quest Log    | Roles with levels, XP bars, 15 achievements each, tech tags   |
+| `education`  | Achievements | Degree + 3 certifications with issuers and focus areas        |
+| `contact`    | Mailbox      | Direct contact cards, copy buttons, contact form              |
+| —            | Footer       | Nav, contact links, download CV                              |
 
 ### Interactive niceties
+- **Searchable skill inventory** — filter 22 categories by any skill name, with match
+  highlighting, result counts, a no-results state, and a collapsible full skill matrix.
+- **Impact dashboard** — quantified outcomes from the CV, an end-to-end medallion
+  architecture blueprint, three featured missions, and six core capabilities.
+- **Copy-to-clipboard contact cards** for email and phone, alongside the existing form.
+- **Scroll-progress bar** under the navbar plus a one-per-session loading screen.
 - **Scroll-triggered animations** via `IntersectionObserver` — fade, slide, scale and rotate
   variants (`scroll-animate`, `-up`, `-left`, `-right`, `-scale`, `-rotate`).
 - **Mouse parallax** on hero blocks and layered backgrounds.
@@ -135,6 +142,7 @@ promoson-portfolio/
 ├── public/
 │   ├── 404.html                # Static "Chunk Not Found" page for static hosts
 │   ├── _headers                # Security + cache headers for Netlify / Cloudflare Pages
+│   ├── og-image.png            # 1200×630 social preview card
 │   └── favicon.svg             # Pixel-art grass block favicon
 └── src/
     ├── main.tsx                # React root + ErrorBoundary + StrictMode
@@ -144,14 +152,18 @@ promoson-portfolio/
     ├── assets/
     │   ├── player-avatar.jpg              # Portrait used in the "Player Portrait" slot
     │   └── PROMOSON_POUDEL_MASTER_ALL.pdf # Résumé served by the "Download CV" button
+    ├── data/
+    │   └── resume.ts           # Single source of truth for all résumé content
     ├── components/
-    │   ├── Navbar.tsx          # Fixed nav, active section, mobile drawer
-    │   ├── HeroSection.tsx     # Landing hero with floating blocks & mouse parallax
-    │   ├── AboutSection.tsx    # "Player Stats" — bio, portrait, stat cards
-    │   ├── SkillsSection.tsx   # "Inventory" — collapsible skill categories
-    │   ├── ExperienceSection.tsx # "Quest Log" — roles, XP bars, achievements
-    │   ├── EducationSection.tsx  # "Achievements" — degrees & certifications
-    │   ├── ContactSection.tsx    # "Mailbox" — contact form with validation
+    │   ├── Navbar.tsx          # Fixed nav, active section, progress bar, mobile drawer
+    │   ├── HeroSection.tsx     # Landing hero with floating blocks, stats & CTAs
+    │   ├── SectionHeading.tsx  # Shared, animated section header
+    │   ├── AboutSection.tsx    # "Player Stats" — summary, portrait, focus, quick facts
+    │   ├── ImpactSection.tsx   # "Impact" — metrics, blueprint, missions, capabilities
+    │   ├── SkillsSection.tsx   # "Inventory" — searchable 22-category skill matrix
+    │   ├── ExperienceSection.tsx # "Quest Log" — roles, XP bars, full achievements
+    │   ├── EducationSection.tsx  # "Achievements" — degree & certifications
+    │   ├── ContactSection.tsx    # "Mailbox" — contact cards + validated form
     │   ├── Footer.tsx          # Footer nav, contact, download CV
     │   ├── DownloadCVButton.tsx # Button state machine around the PDF download
     │   ├── LoadingScreen.tsx   # Progress bar + rotating tips
@@ -319,7 +331,8 @@ jobs:
       - run: npm run build
         env:
           VITE_FORMSPREE_ID: ${{ vars.VITE_FORMSPREE_ID }}
-          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH }}
+          # Defaults to this repo's project-site path; set "/" for a custom domain.
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/promoson-portfolio/' }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -336,9 +349,11 @@ jobs:
 
 > Set **Settings → Pages → Source** to *GitHub Actions*, then add repository variables under
 > **Settings → Secrets and variables → Actions → Variables**:
-> `VITE_FORMSPREE_ID` (your Formspree form ID) and — only for a project sub-path like
-> `/promoson-portfolio/` — `VITE_BASE_PATH`. `vite.config.js` reads both at build time.
-> GitHub Pages cannot send custom headers, so `public/_headers` is ignored there.
+> `VITE_FORMSPREE_ID` (your Formspree form ID) and, only when the site does not live at
+> `/promoson-portfolio/`, `VITE_BASE_PATH`. The workflow defaults the base path to this
+> repo's project-site path of `/promoson-portfolio/`; set it to `/` for a custom domain.
+> `vite.config.js` reads both at build time. GitHub Pages cannot send custom headers, so
+> `public/_headers` is ignored there.
 
 ### Netlify / Vercel / Cloudflare Pages
 Build command `npm run build`, publish directory `dist`. Add `VITE_FORMSPREE_ID` as a build
@@ -357,15 +372,17 @@ plus long-lived caching for the fingerprinted `assets/*` files.
 
 | I want to change…                     | Where                                                        |
 | ------------------------------------- | ------------------------------------------------------------ |
-| Résumé content (roles, skills, certs)| `src/components/SkillsSection.tsx`, `ExperienceSection.tsx`, `EducationSection.tsx` |
+| Résumé content (roles, skills, certs)| `src/data/resume.ts` (single source of truth)                 |
 | The PDF résumé file                    | `src/assets/PROMOSON_POUDEL_MASTER_ALL.pdf`                  |
-| Bio and headline                      | `src/components/AboutSection.tsx`, `HeroSection.tsx`          |
+| Bio and headline                      | `src/data/resume.ts` (`profile`)                              |
+| Impact metrics, blueprint & missions  | `src/data/resume.ts` (`impactMetrics`, `architectureLayers`, `featuredWork`) |
 | Where visitor messages are delivered  | `VITE_FORMSPREE_ID` in `.env.local`, or `src/config/contact.ts` |
 | Recipient email address               | `src/config/contact.ts` (`CONTACT_EMAIL`)                     |
 | Security headers / asset caching      | `public/_headers`                                             |
 | Content-Security-Policy               | `index.html`                                                  |
 | Colours and block styles              | `src/index.css` (colour literals like `#5D8C3E`, `#FCDB05`)  |
-| Page title, meta and OG tags          | `index.html`                                                  |
+| Page title, meta, OG tags & JSON-LD   | `index.html`                                                  |
+| Social preview image                  | `public/og-image.png` (1200×630)                              |
 | Port, chunking, build target          | `vite.config.js`                                              |
 | Favicon                               | `public/favicon.svg`                                          |
 
@@ -390,7 +407,10 @@ the site never requires touching the JSX.
   Cloudflare Pages), plus immutable caching for the fingerprinted assets.
 - HTTPS is expected in production; every recommended host provisions a free certificate
   automatically. See [LAUNCH.md](LAUNCH.md).
-- SEO metadata: canonical title, description, Open Graph and Twitter Card tags.
+- SEO metadata: canonical title, description, keywords, Open Graph and Twitter Card tags,
+  a 1200×630 social preview image, and `Person` JSON-LD listing skills and credentials.
+- A print stylesheet turns the page into a readable document and reveals collapsed résumé
+  detail when printing or saving to PDF.
 - The static `public/404.html` is marked `noindex`.
 
 ---

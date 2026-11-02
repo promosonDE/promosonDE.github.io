@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { useScrollAnimation } from '../hooks/useScrollAnimation'
+import SectionHeading from './SectionHeading'
 import { CONTACT_EMAIL, FORM_ACTION, FORM_HIDDEN_FIELDS, IS_FORM_CONFIGURED } from '../config/contact'
+import { profile } from '../data/resume'
 import { HONEYPOT_FIELD, submitContactForm } from '../utils/contact'
 
 type SubmitState = 'idle' | 'sending' | 'success' | 'error'
+type CopyTarget = 'email' | 'phone' | null
 
 interface FormFields {
   name: string
@@ -43,14 +45,15 @@ function validate(fields: FormFields): FieldErrors {
 }
 
 export default function ContactSection() {
-  const titleAnim = useScrollAnimation()
-  const formAnim = useScrollAnimation({ threshold: 0.05 })
-
   const [fields, setFields] = useState<FormFields>(EMPTY_FIELDS)
   const [errors, setErrors] = useState<FieldErrors>({})
   const [state, setState] = useState<SubmitState>('idle')
   const [statusMsg, setStatusMsg] = useState('')
+  const [copied, setCopied] = useState<CopyTarget>(null)
   const honeypot = useRef<HTMLInputElement>(null)
+  const copyTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(() => () => clearTimeout(copyTimer.current), [])
 
   const update = (key: keyof FormFields, value: string) => {
     setFields((prev) => ({ ...prev, [key]: value }))
@@ -59,6 +62,18 @@ export default function ContactSection() {
       setErrors((prev) => ({ ...prev, [key]: undefined }))
     }
     if (state === 'error') setState('idle')
+  }
+
+  const copy = async (value: string, target: Exclude<CopyTarget, null>) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopied(target)
+      clearTimeout(copyTimer.current)
+      copyTimer.current = setTimeout(() => setCopied(null), 2200)
+    } catch {
+      // Clipboard access can be blocked; the mailto/tel links still work.
+      setCopied(null)
+    }
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -119,25 +134,47 @@ export default function ContactSection() {
 
   return (
     <section id="contact" className="py-20 px-4 relative">
-      <div className="absolute inset-0 bg-[#1a1a2e]/70 backdrop-blur-[0.5px]" />
+      <div className="absolute inset-0 bg-[#1a1a2e]/75 backdrop-blur-[0.5px]" />
 
       <div className="relative z-10 max-w-4xl mx-auto">
-        {/* Section Title */}
-        <div
-          ref={titleAnim.ref}
-          className="text-center mb-12 scroll-animate-up"
-        >
-          <h2 className="pixel-font text-xl sm:text-2xl text-[#FCDB05] mb-4 drop-shadow-[2px_2px_0px_#3C3C3C]">
-            ✉️ Mailbox
-          </h2>
-          <p className="text-gray-400 text-lg">Send a message</p>
-          <div className="w-32 h-1 bg-[#FCDB05] mx-auto mt-4" />
+        <SectionHeading
+          eyebrow="▸ LET'S BUILD SOMETHING"
+          title="✉️ Mailbox"
+          subtitle="Open to conversations about senior data engineering, lakehouse architecture, and AI-ready platforms."
+        />
+
+        {/* Direct contact cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+          <ContactCard
+            icon="📧"
+            label="Email"
+            value={profile.email}
+            href={`mailto:${profile.email}`}
+            color="#4AEDD9"
+            copied={copied === 'email'}
+            onCopy={() => copy(profile.email, 'email')}
+          />
+          <ContactCard
+            icon="📱"
+            label="Phone"
+            value={profile.phone}
+            href={`tel:${profile.phoneHref}`}
+            color="#17DD62"
+            copied={copied === 'phone'}
+            onCopy={() => copy(profile.phone, 'phone')}
+          />
+          <ContactCard
+            icon="🔗"
+            label="LinkedIn"
+            value={profile.linkedinLabel}
+            href={profile.linkedin}
+            color="#FCDB05"
+            external
+            copied={false}
+          />
         </div>
 
-        <div
-          ref={formAnim.ref}
-          className="mc-panel scroll-animate-up"
-        >
+        <div className="mc-panel scroll-animate-up">
           {/* Setup notice — visible only until a provider endpoint is configured */}
           {!IS_FORM_CONFIGURED && (
             <div className="mb-6 border-2 border-[#FCDB05] bg-[#FCDB05]/10 p-4">
@@ -225,7 +262,7 @@ export default function ContactSection() {
                 className="mc-input"
               />
               {errors.message && (
-                <p id="contact-message-error" className="text-xs text-[#B02E26] mt-2">
+                <p id="contact-message-error" className="text-xs text-[#FF7B72] mt-2">
                   {errors.message}
                 </p>
               )}
@@ -275,6 +312,51 @@ export default function ContactSection() {
   )
 }
 
+interface ContactCardProps {
+  icon: string
+  label: string
+  value: string
+  href: string
+  color: string
+  external?: boolean
+  copied: boolean
+  onCopy?: () => void
+}
+
+function ContactCard({ icon, label, value, href, color, external, copied, onCopy }: ContactCardProps) {
+  return (
+    <div
+      className="mc-panel flex flex-col gap-2 transition-transform duration-300 hover:-translate-y-1"
+      style={{ borderColor: `${color}66` }}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-xl" aria-hidden="true">{icon}</span>
+        <span className="pixel-font text-[8px]" style={{ color }}>
+          {label.toUpperCase()}
+        </span>
+      </div>
+      <a
+        href={href}
+        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        className="text-sm sm:text-base text-gray-200 hover:text-white underline decoration-dotted underline-offset-2 break-all"
+      >
+        {value}
+      </a>
+      {onCopy && (
+        <button
+          type="button"
+          onClick={onCopy}
+          aria-label={`Copy ${label} to clipboard`}
+          className="text-[10px] self-start px-2 py-1 border border-[#5A5A5A] bg-[#2C2C2C] text-gray-400 hover:text-white hover:border-[#7F7F7F] transition-colors"
+          aria-live="polite"
+        >
+          {copied ? '✓ Copied' : 'Copy'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 interface FieldProps {
   id: string
   name: string
@@ -307,7 +389,7 @@ function Field({ id, name, label, type = 'text', placeholder, value, error, onCh
         className="mc-input"
       />
       {error && (
-        <p id={`${id}-error`} className="text-xs text-[#B02E26] mt-2">
+        <p id={`${id}-error`} className="text-xs text-[#FF7B72] mt-2">
           {error}
         </p>
       )}
