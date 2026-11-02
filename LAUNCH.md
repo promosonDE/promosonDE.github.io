@@ -180,13 +180,12 @@ Free and already where your code lives, but it ignores `_headers`, so you get th
    New variable: VITE_FORMSPREE_ID = your-form-id
    ```
 
-4. **If you are *not* using a custom domain**, the site lives at
-   `https://<username>.github.io/<repo>/` (`/promoson-portfolio/` for this
-   repo). The workflow already defaults the base path to that, so assets
-   resolve without extra setup. Once you attach a custom domain the site sits at
-   the root: add a repository variable `VITE_BASE_PATH` set to `/` to override
-   the default. Without the correct base path every asset 404s and you get a
-   blank page.
+4. This repo is a **user site** (`promosonDE.github.io`), so it lives at
+   <https://promosonde.github.io/> and the workflow defaults the base path to
+   `/`. A *project* site instead lives at
+   `https://<username>.github.io/<repo>/`; set the repository variable
+   `VITE_BASE_PATH` to `/<repo>/` in that case. Without the correct base path
+   every asset 404s and you get a blank page.
 
 ### Option D — Vercel
 
@@ -307,9 +306,9 @@ npm audit
 - [ ] Custom domain resolves, and `www` resolves too
 - [ ] Favicon appears in the browser tab
 - [ ] Lighthouse (DevTools → Lighthouse) — aim for 90+ on Performance, Accessibility, Best Practices, SEO
-- [ ] Change `og:image` / `twitter:image` in `index.html` from `/og-image.png` to the
-      absolute production URL (`https://yourdomain.com/og-image.png`) so social
-      scrapers can fetch it
+- [ ] `og:image` / `twitter:image` / `canonical` in `index.html` point at the live
+      domain (`https://promosonde.github.io/`) — update them to
+      `https://yourdomain.com/...` if you attach a custom domain
 - [ ] Add the live URL to your LinkedIn, GitHub profile and CV
 - [ ] Submit the site to [Google Search Console](https://search.google.com/search-console) so it gets indexed
 

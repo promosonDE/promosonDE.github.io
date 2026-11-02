@@ -8,6 +8,8 @@ the screen as you scroll.
 Built with React + TypeScript + Vite + Tailwind CSS. No backend, no database — a fully static
 bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host.
 
+**Live site:** <https://promosonde.github.io/>
+
 ---
 
 ## Table of Contents
@@ -107,8 +109,8 @@ bundle that can be deployed to GitHub Pages, Netlify, Vercel, or any static host
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/RojanDA/promoson-portfolio.git
-cd promoson-portfolio
+git clone https://github.com/promosonDE/promosonDE.github.io.git
+cd promosonDE.github.io
 
 # 2. Install dependencies
 npm install
@@ -133,7 +135,7 @@ npm run typecheck # tsc --noEmit, no output emitted
 ## Project Structure
 
 ```
-promoson-portfolio/
+promosonDE.github.io/
 ├── index.html                  # Entry HTML: SEO/OG meta, CSP, fonts, #root mount
 ├── vite.config.js              # Vite config (base path, port 3000, manual chunks, es2020)
 ├── tsconfig.json               # Strict TypeScript config
@@ -331,8 +333,8 @@ jobs:
       - run: npm run build
         env:
           VITE_FORMSPREE_ID: ${{ vars.VITE_FORMSPREE_ID }}
-          # Defaults to this repo's project-site path; set "/" for a custom domain.
-          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/promoson-portfolio/' }}
+          # "/" suits this user site or a custom domain; use "/<repo>/" for a project site.
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/' }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -355,11 +357,10 @@ jobs:
 >
 > Set **Settings → Pages → Source** to *GitHub Actions*, then add repository variables under
 > **Settings → Secrets and variables → Actions → Variables**:
-> `VITE_FORMSPREE_ID` (your Formspree form ID) and, only when the site does not live at
-> `/promoson-portfolio/`, `VITE_BASE_PATH`. The workflow defaults the base path to this
-> repo's project-site path of `/promoson-portfolio/`; set it to `/` for a custom domain.
-> `vite.config.js` reads both at build time. GitHub Pages cannot send custom headers, so
-> `public/_headers` is ignored there.
+> `VITE_FORMSPREE_ID` (your Formspree form ID). The workflow defaults the base path to `/`
+> (correct for a `<username>.github.io` site or a custom domain); set `VITE_BASE_PATH` to
+> `/<repo>/` only for a project site. `vite.config.js` reads both at build time.
+> GitHub Pages cannot send custom headers, so `public/_headers` is ignored there.
 
 ### Netlify / Vercel / Cloudflare Pages
 Build command `npm run build`, publish directory `dist`. Add `VITE_FORMSPREE_ID` as a build

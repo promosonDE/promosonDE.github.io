@@ -35,11 +35,10 @@ jobs:
 
       - run: npm run build
         env:
-          # A GitHub Pages *project* site is served from /<repo>/, so every
-          # asset URL needs that prefix. Set the repository variable
-          # VITE_BASE_PATH to "/" once you attach a custom domain, since the
-          # site then lives at the root.
-          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/promoson-portfolio/' }}
+          # A <username>.github.io repo (this site) and a custom domain both
+          # live at "/". A *project* site is served from /<repo>/, so set the
+          # repository variable VITE_BASE_PATH to "/<repo>/" in that case.
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/' }}
 
           # Set under Settings -> Secrets and variables -> Actions -> Variables.
           # Empty is fine: the form then shows its "setup required" notice
